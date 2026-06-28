@@ -3,9 +3,10 @@ export type MatchResult = "HOME" | "AWAY" | "DRAW";
 
 export interface User {
   id: string;
-  username: string;
+  phone: string;
   display_name: string;
   is_admin: boolean;
+  approved: boolean;
 }
 
 export interface Match {
@@ -25,8 +26,8 @@ export interface Match {
   reg_home: number | null;
   reg_away: number | null;
   result: MatchResult | null;
-  went_to_pens: boolean;
-  pen_winner: Side | null;
+  drew_at_90: boolean; // true if level after 90' (decided in extra time or penalties)
+  advance_winner: Side | null; // who advanced when it was a draw at 90'
   scored: boolean;
   updated_at: string;
 }
@@ -37,7 +38,7 @@ export interface Prediction {
   match_id: string;
   pred_home: number;
   pred_away: number;
-  pred_pen_winner: Side | null;
+  pred_advance_winner: Side | null;
   points: number | null;
   created_at: string;
   updated_at: string;
@@ -45,7 +46,7 @@ export interface Prediction {
 
 export interface SessionUser {
   id: string;
-  username: string;
+  phone: string;
   display_name: string;
   is_admin: boolean;
 }

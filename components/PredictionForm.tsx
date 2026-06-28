@@ -11,7 +11,7 @@ interface Props {
   initial: {
     pred_home: number | null;
     pred_away: number | null;
-    pred_pen_winner: "HOME" | "AWAY" | null;
+    pred_advance_winner: "HOME" | "AWAY" | null;
   };
 }
 
@@ -25,7 +25,7 @@ export default function PredictionForm({
 }: Props) {
   const [home, setHome] = useState(initial.pred_home?.toString() ?? "");
   const [away, setAway] = useState(initial.pred_away?.toString() ?? "");
-  const [pen, setPen] = useState<"HOME" | "AWAY" | "">(initial.pred_pen_winner ?? "");
+  const [pen, setPen] = useState<"HOME" | "AWAY" | "">(initial.pred_advance_winner ?? "");
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">(
     initial.pred_home != null ? "saved" : "idle"
   );
@@ -42,7 +42,7 @@ export default function PredictionForm({
     }
     if (isTie && pen === "") {
       setStatus("error");
-      setMsg("Elige quién gana en penales.");
+      setMsg("Elige qué equipo pasa a la siguiente ronda.");
       return;
     }
     setStatus("saving");
@@ -54,7 +54,7 @@ export default function PredictionForm({
           match_id: matchId,
           pred_home: Number(home),
           pred_away: Number(away),
-          pred_pen_winner: isTie ? pen : null,
+          pred_advance_winner: isTie ? pen : null,
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -117,7 +117,7 @@ export default function PredictionForm({
 
       {isTie && (
         <div className="mt-3 text-center">
-          <p className="mb-1 text-xs font-semibold text-amber-200">Empate: ¿quién gana en penales?</p>
+          <p className="mb-1 text-xs font-semibold text-amber-200">Empate: ¿quién pasa a la siguiente ronda?</p>
           <div className="flex justify-center gap-2">
             <button
               type="button"

@@ -4,15 +4,37 @@ import { db } from "@/lib/db";
 import { formatBogota } from "@/lib/time";
 import { STAGE_ORDER, stageLabel } from "@/lib/football";
 import type { Match } from "@/lib/types";
-import AdminPanel, { type AdminMatch } from "@/components/AdminPanel";
+import AdminPanel, {
+  type AdminMatch,
+  type PendingUser,
+  type ApprovedUser,
+} from "@/components/AdminPanel";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
-  await requireAdmin();
+  const admin = await requireAdmin();
+  const supabase = db();
 
-  const { data } = await db().from("matches").select("*");
-  const matches = (data ?? []) as Match[];
+  const [{ data: matchesRaw }, { data: usersRaw }] = await Promise.all([
+    supabase.from("matches").select("*"),
+    supabase.from("users").select("id, display_name, phone, approved").order("created_at"),
+  ]);
+
+  const matches = (matchesRaw ?? []) as Match[];
+  const users = (usersRaw ?? []) as {
+    id: string;
+    display_name: string;
+    phone: string;
+    approved: boolean;
+  }[];
+
+  const pending: PendingUser[] = users
+    .filter((u) => !u.approved)
+    .map((u) => ({ id: u.id, display_name: u.display_name, phone: u.phone }));
+  const approved: ApprovedUser[] = users
+    .filter((u) => u.approved && u.id !== admin.id)
+    .map((u) => ({ id: u.id, display_name: u.display_name, phone: u.phone }));
 
   const adminMatches: AdminMatch[] = matches
     .filter((m) => m.home_team && m.away_team)
@@ -33,8 +55,8 @@ export default async function AdminPage() {
       status: m.status,
       reg_home: m.reg_home,
       reg_away: m.reg_away,
-      went_to_pens: m.went_to_pens,
-      pen_winner: m.pen_winner,
+      drew_at_90: m.drew_at_90,
+      advance_winner: m.advance_winner,
     }));
 
   return (
@@ -50,7 +72,7 @@ export default async function AdminPage() {
           ← Volver
         </Link>
       </header>
-      <AdminPanel matches={adminMatches} />
+      <AdminPanel matches={adminMatches} pending={pending} approved={approved} />
     </main>
   );
 }

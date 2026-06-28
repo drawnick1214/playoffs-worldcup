@@ -26,7 +26,7 @@ export async function POST(req: Request) {
   const matchId = String(body.match_id ?? "");
   const predHome = parseGoals(body.pred_home);
   const predAway = parseGoals(body.pred_away);
-  let penWinner = (body.pred_pen_winner as Side | null) ?? null;
+  let advanceWinner = (body.pred_advance_winner as Side | null) ?? null;
 
   if (!matchId || predHome === null || predAway === null) {
     return NextResponse.json({ error: "Marcador inválido." }, { status: 400 });
@@ -44,21 +44,21 @@ export async function POST(req: Request) {
   }
   if (match.status === "FINISHED" || isLocked(match.kickoff_utc)) {
     return NextResponse.json(
-      { error: "El partido ya inició. La predicción está cerrada." },
+      { error: "La predicción está cerrada (se bloquea 15 minutos antes del partido)." },
       { status: 403 }
     );
   }
 
-  // A tie requires choosing who wins the penalty shootout.
+  // A tie requires choosing which team advances (wins the tie).
   if (predHome === predAway) {
-    if (penWinner !== "HOME" && penWinner !== "AWAY") {
+    if (advanceWinner !== "HOME" && advanceWinner !== "AWAY") {
       return NextResponse.json(
-        { error: "Si predices empate, elige quién gana en penales." },
+        { error: "Si predices empate, elige qué equipo pasa a la siguiente ronda." },
         { status: 400 }
       );
     }
   } else {
-    penWinner = null;
+    advanceWinner = null;
   }
 
   const { error } = await db().from("predictions").upsert(
@@ -67,7 +67,7 @@ export async function POST(req: Request) {
       match_id: matchId,
       pred_home: predHome,
       pred_away: predAway,
-      pred_pen_winner: penWinner,
+      pred_advance_winner: advanceWinner,
       points: null,
       updated_at: new Date().toISOString(),
     },

@@ -65,7 +65,7 @@ export async function scoreFinishedMatches(): Promise<{
   let scoredPredictions = 0;
 
   for (const m of matches) {
-    if (m.reg_home == null || m.reg_away == null || m.result == null) continue; // wait for data
+    if (m.result == null) continue; // wait for the result to be available
 
     const { data: predsRaw } = await supabase
       .from("predictions")
@@ -79,13 +79,13 @@ export async function scoreFinishedMatches(): Promise<{
           reg_home: m.reg_home,
           reg_away: m.reg_away,
           result: m.result,
-          went_to_pens: m.went_to_pens,
-          pen_winner: m.pen_winner,
+          drew_at_90: m.drew_at_90,
+          advance_winner: m.advance_winner,
         },
         {
           pred_home: p.pred_home,
           pred_away: p.pred_away,
-          pred_pen_winner: p.pred_pen_winner,
+          pred_advance_winner: p.pred_advance_winner,
         }
       );
       await supabase.from("predictions").update({ points }).eq("id", p.id);

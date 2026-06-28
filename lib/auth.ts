@@ -15,7 +15,7 @@ function secret(): Uint8Array {
 /** Create a signed session cookie for the given user. */
 export async function setSession(user: SessionUser): Promise<void> {
   const token = await new SignJWT({
-    username: user.username,
+    phone: user.phone,
     display_name: user.display_name,
     is_admin: user.is_admin,
   })
@@ -49,7 +49,7 @@ export async function getSession(): Promise<SessionUser | null> {
     const { payload } = await jwtVerify(token, secret());
     return {
       id: payload.sub as string,
-      username: payload.username as string,
+      phone: payload.phone as string,
       display_name: payload.display_name as string,
       is_admin: Boolean(payload.is_admin),
     };

@@ -7,21 +7,32 @@ type Mode = "login" | "register";
 export default function LoginPage() {
   const [mode, setMode] = useState<Mode>("login");
   const [displayName, setDisplayName] = useState("");
-  const [username, setUsername] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  function onPhoneChange(v: string) {
+    // digits only, max 10
+    setPhone(v.replace(/\D/g, "").slice(0, 10));
+  }
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+
+    if (!/^3\d{9}$/.test(phone)) {
+      setError("El celular debe tener 10 dígitos y empezar por 3.");
+      return;
+    }
+
     setLoading(true);
     try {
       const endpoint = mode === "login" ? "/api/login" : "/api/register";
       const payload =
         mode === "login"
-          ? { username, password }
-          : { username, password, display_name: displayName };
+          ? { phone, password }
+          : { phone, password, display_name: displayName };
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -59,7 +70,6 @@ export default function LoginPage() {
           <p className="mt-2 text-sm text-white/80">Predice los playoffs y compite con tus amigos.</p>
         </div>
 
-        {/* Tabs */}
         <div className="mb-4 grid grid-cols-2 gap-1 rounded-xl bg-white/10 p-1 backdrop-blur">
           <button
             type="button"
@@ -96,17 +106,20 @@ export default function LoginPage() {
                 onChange={(e) => setDisplayName(e.target.value)}
                 placeholder="Ej. Edward"
                 className={inputCls}
+                required
               />
             </div>
           )}
           <div>
-            <label className="mb-1 block text-sm font-semibold text-white/90">Usuario</label>
+            <label className="mb-1 block text-sm font-semibold text-white/90">Celular</label>
             <input
-              type="text"
-              autoCapitalize="none"
-              autoCorrect="off"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              type="tel"
+              inputMode="numeric"
+              autoComplete="tel"
+              value={phone}
+              onChange={(e) => onPhoneChange(e.target.value)}
+              placeholder="3001234567"
+              maxLength={10}
               className={inputCls}
               required
             />
@@ -137,7 +150,7 @@ export default function LoginPage() {
           </button>
           {mode === "register" && (
             <p className="text-center text-xs text-white/60">
-              Crea tu usuario una sola vez. Luego entras con esos mismos datos.
+              Tu cuenta quedará pendiente hasta que el administrador la apruebe.
             </p>
           )}
         </form>

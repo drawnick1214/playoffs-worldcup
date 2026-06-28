@@ -31,28 +31,28 @@ export async function POST(req: Request) {
   const matchId = String(body.match_id ?? "");
   const regHome = parseGoals(body.reg_home);
   const regAway = parseGoals(body.reg_away);
-  const wentToPens = Boolean(body.went_to_pens);
-  let penWinner = (body.pred_pen_winner ?? body.pen_winner ?? null) as Side | null;
+  const drewAt90 = Boolean(body.drew_at_90);
+  let advanceWinner = (body.advance_winner ?? null) as Side | null;
 
   if (!matchId || regHome === null || regAway === null) {
     return NextResponse.json({ error: "Marcador inválido." }, { status: 400 });
   }
 
-  if (wentToPens) {
+  if (drewAt90) {
     if (regHome !== regAway) {
       return NextResponse.json(
-        { error: "Si fue a penales, el marcador de 90' debe ser empate." },
+        { error: "Si fue empate al 90' (prórroga/penales), el marcador debe ser empate." },
         { status: 400 }
       );
     }
-    if (penWinner !== "HOME" && penWinner !== "AWAY") {
-      return NextResponse.json({ error: "Elige el ganador de los penales." }, { status: 400 });
+    if (advanceWinner !== "HOME" && advanceWinner !== "AWAY") {
+      return NextResponse.json({ error: "Elige qué equipo pasó." }, { status: 400 });
     }
   } else {
-    penWinner = null;
+    advanceWinner = null;
   }
 
-  const result: MatchResult = wentToPens ? "DRAW" : classify(regHome, regAway);
+  const result: MatchResult = drewAt90 ? "DRAW" : classify(regHome, regAway);
 
   const { error } = await db()
     .from("matches")
@@ -61,8 +61,8 @@ export async function POST(req: Request) {
       reg_home: regHome,
       reg_away: regAway,
       result,
-      went_to_pens: wentToPens,
-      pen_winner: penWinner,
+      drew_at_90: drewAt90,
+      advance_winner: advanceWinner,
       scored: false, // force re-scoring
       updated_at: new Date().toISOString(),
     })

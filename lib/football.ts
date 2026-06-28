@@ -78,8 +78,8 @@ export interface MatchRow {
   reg_home: number | null;
   reg_away: number | null;
   result: MatchResult | null;
-  went_to_pens: boolean;
-  pen_winner: Side | null;
+  drew_at_90: boolean;
+  advance_winner: Side | null;
 }
 
 const API_BASE = "https://api.football-data.org/v4";
@@ -112,34 +112,38 @@ export async function fetchWorldCupMatches(): Promise<FdMatch[]> {
  */
 function deriveScore(m: FdMatch): Pick<
   MatchRow,
-  "reg_home" | "reg_away" | "result" | "went_to_pens" | "pen_winner"
+  "reg_home" | "reg_away" | "result" | "drew_at_90" | "advance_winner"
 > {
   const s = m.score;
-  const wentToPens = s.duration === "PENALTY_SHOOTOUT";
   const home = s.fullTime?.home ?? null;
   const away = s.fullTime?.away ?? null;
+  // A draw at 90' is exactly when the match went beyond regular time.
+  const drewAt90 = s.duration === "EXTRA_TIME" || s.duration === "PENALTY_SHOOTOUT";
 
-  let result: MatchResult | null = null;
-  let penWinner: Side | null = null;
-
-  if (wentToPens) {
-    result = "DRAW";
-    penWinner = s.winner === "AWAY_TEAM" ? "AWAY" : "HOME";
-  } else if (s.winner === "HOME_TEAM") {
-    result = "HOME";
-  } else if (s.winner === "AWAY_TEAM") {
-    result = "AWAY";
-  } else if (home != null && away != null) {
-    result = home > away ? "HOME" : home < away ? "AWAY" : "DRAW";
+  if (drewAt90) {
+    // Level after 90'. The overall winner is the team that advanced.
+    // For penalty shootouts fullTime is the (level) 90' score; for extra time
+    // fullTime includes extra-time goals, so the 90' scoreline is unknown.
+    const reg = s.duration === "PENALTY_SHOOTOUT" ? { home, away } : { home: null, away: null };
+    return {
+      reg_home: reg.home,
+      reg_away: reg.away,
+      result: "DRAW",
+      drew_at_90: true,
+      advance_winner: s.winner === "AWAY_TEAM" ? "AWAY" : "HOME",
+    };
   }
 
-  return {
-    reg_home: home,
-    reg_away: away,
-    result,
-    went_to_pens: wentToPens,
-    pen_winner: penWinner,
-  };
+  let result: MatchResult | null = null;
+  if (s.winner === "HOME_TEAM") result = "HOME";
+  else if (s.winner === "AWAY_TEAM") result = "AWAY";
+  else if (home != null && away != null) result = classifyGoals(home, away);
+
+  return { reg_home: home, reg_away: away, result, drew_at_90: false, advance_winner: null };
+}
+
+function classifyGoals(home: number, away: number): MatchResult {
+  return home > away ? "HOME" : home < away ? "AWAY" : "DRAW";
 }
 
 /** Map a football-data match to a `matches` row, or null if not a knockout match. */
@@ -153,8 +157,8 @@ export function mapMatch(m: FdMatch): MatchRow | null {
         reg_home: null,
         reg_away: null,
         result: null,
-        went_to_pens: false,
-        pen_winner: null,
+        drew_at_90: false,
+        advance_winner: null,
       };
 
   return {

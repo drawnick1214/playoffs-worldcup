@@ -18,10 +18,13 @@ export function formatBogota(iso: string | null): string {
   return dateFmt.format(d);
 }
 
-/** A prediction is locked once the match has kicked off. */
+/** Predictions lock this many milliseconds BEFORE kickoff. */
+export const LOCK_BEFORE_MS = 15 * 60 * 1000; // 15 minutes
+
+/** A prediction is locked from 15 minutes before kickoff. */
 export function isLocked(kickoffIso: string | null, now: Date = new Date()): boolean {
   if (!kickoffIso) return false; // teams/date not set yet -> not lockable
   const k = new Date(kickoffIso);
   if (isNaN(k.getTime())) return false;
-  return now.getTime() >= k.getTime();
+  return now.getTime() >= k.getTime() - LOCK_BEFORE_MS;
 }

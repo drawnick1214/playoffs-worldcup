@@ -11,10 +11,11 @@ create extension if not exists pgcrypto;
 
 create table if not exists users (
   id            uuid primary key default gen_random_uuid(),
-  username      text not null unique,
+  phone         text unique,                     -- 10 dígitos, empieza por 3 (identificador / login)
   password_hash text not null,
   display_name  text not null,
   is_admin      boolean not null default false,
+  approved      boolean not null default false,  -- el admin debe aprobar antes de jugar
   created_at    timestamptz not null default now()
 );
 
@@ -35,8 +36,8 @@ create table if not exists matches (
   reg_home       int,                             -- regulation (90') goals, home
   reg_away       int,                             -- regulation (90') goals, away
   result         text,                            -- HOME / AWAY / DRAW (at 90')
-  went_to_pens   boolean not null default false,
-  pen_winner     text,                            -- HOME / AWAY (shootout winner)
+  drew_at_90     boolean not null default false,  -- empate al 90' (definido en prórroga o penales)
+  advance_winner text,                            -- HOME / AWAY (equipo que pasó la llave)
   scored         boolean not null default false,  -- points already distributed
   updated_at     timestamptz not null default now()
 );
@@ -45,10 +46,10 @@ create table if not exists predictions (
   id              uuid primary key default gen_random_uuid(),
   user_id         uuid not null references users(id) on delete cascade,
   match_id        uuid not null references matches(id) on delete cascade,
-  pred_home       int not null,
-  pred_away       int not null,
-  pred_pen_winner text,                           -- HOME / AWAY (required if a tie)
-  points          int,                            -- null until the match is scored
+  pred_home           int not null,
+  pred_away           int not null,
+  pred_advance_winner text,                       -- HOME / AWAY (requerido si predice empate)
+  points              int,                        -- null until the match is scored
   created_at      timestamptz not null default now(),
   updated_at      timestamptz not null default now(),
   unique (user_id, match_id)
@@ -62,8 +63,8 @@ create index if not exists predictions_user_idx  on predictions(user_id);
 -- The FIRST person to register automatically becomes the admin.
 --
 -- To grant admin to someone else later:
---   update users set is_admin = true where username = 'su_usuario';
+--   update users set is_admin = true where phone = '3001234567';
 -- To reset a password manually:
 --   update users set password_hash = crypt('nueva-clave', gen_salt('bf', 10))
---   where username = 'su_usuario';
+--   where phone = '3001234567';
 -- ---------------------------------------------------------------------------

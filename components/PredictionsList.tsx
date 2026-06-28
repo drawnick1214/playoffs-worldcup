@@ -4,7 +4,7 @@ export interface RevealRow {
   name: string;
   home: number;
   away: number;
-  penWinner: Side | null;
+  advanceWinner: Side | null;
   points: number | null;
   isMe: boolean;
 }
@@ -52,9 +52,9 @@ export default function PredictionsList({ rows, homeTeam, awayTeam, showPoints }
               <span className="font-semibold">
                 {r.home} - {r.away}
               </span>
-              {r.home === r.away && r.penWinner && (
+              {r.home === r.away && r.advanceWinner && (
                 <span className="text-xs text-white/60">
-                  pen: {r.penWinner === "HOME" ? homeTeam : awayTeam}
+                  pasa: {r.advanceWinner === "HOME" ? homeTeam : awayTeam}
                 </span>
               )}
               {showPoints && (
