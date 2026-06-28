@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { fetchWorldCupMatches, mapMatch } from "./football";
+import { fetchWorldCupMatches, fetchVenueMap, mapMatch } from "./football";
 import { scorePrediction } from "./scoring";
 import type { Match, Prediction } from "./types";
 
@@ -17,9 +17,18 @@ export interface SyncResult {
 export async function runSync(): Promise<SyncResult> {
   const supabase = db();
 
-  // 1. Fetch + map knockout matches.
-  const fdMatches = await fetchWorldCupMatches();
-  const rows = fdMatches.map(mapMatch).filter((r): r is NonNullable<typeof r> => r !== null);
+  // 1. Fetch + map knockout matches, plus venues from openfootball (best-effort).
+  const [fdMatches, venueMap] = await Promise.all([
+    fetchWorldCupMatches(),
+    fetchVenueMap().catch(() => ({} as Record<string, string>)),
+  ]);
+  const rows = fdMatches
+    .map(mapMatch)
+    .filter((r): r is NonNullable<typeof r> => r !== null)
+    .map((r) => {
+      const key = r.kickoff_utc ? new Date(r.kickoff_utc).toISOString() : null;
+      return { ...r, venue: (key && venueMap[key]) || r.venue };
+    });
 
   // 2. Upsert (by external_id). `scored` is never in the payload, so the flag
   //    is preserved on existing rows.

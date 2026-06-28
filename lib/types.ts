@@ -20,6 +20,7 @@ export interface Match {
   home_team_crest: string | null;
   away_team_crest: string | null;
   kickoff_utc: string | null;
+  venue: string | null;
   status: string | null;
   reg_home: number | null;
   reg_away: number | null;

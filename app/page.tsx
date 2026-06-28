@@ -141,6 +141,10 @@ export default async function HomePage() {
         </ul>
       </details>
 
+      <p className="mb-4 text-center text-xs text-white/70">
+        🕐 Todos los horarios están en hora de Colombia 🇨🇴
+      </p>
+
       {/* Matches */}
       {groups.length === 0 && (
         <p className="rounded-xl border border-white/20 bg-white/10 p-6 text-center text-white/80 backdrop-blur">
@@ -179,14 +183,17 @@ export default async function HomePage() {
                   key={m.id}
                   className="rounded-xl border border-white/20 bg-white/10 p-4 shadow-lg backdrop-blur-md transition hover:bg-white/15"
                 >
-                  <div className="flex items-center justify-between text-xs text-white/70">
-                    <span>{formatBogota(m.kickoff_utc)}</span>
+                  <div className="flex items-start justify-between gap-2 text-xs text-white/70">
+                    <span className="flex flex-col gap-0.5">
+                      <span>🕐 {formatBogota(m.kickoff_utc)}</span>
+                      {m.venue && <span className="text-white/60">📍 {m.venue}</span>}
+                    </span>
                     {finished ? (
-                      <span className="rounded-full bg-emerald-400/20 px-2 py-0.5 font-bold text-emerald-200">
+                      <span className="shrink-0 rounded-full bg-emerald-400/20 px-2 py-0.5 font-bold text-emerald-200">
                         Finalizado
                       </span>
                     ) : locked && teamsKnown ? (
-                      <span className="rounded-full bg-amber-400/20 px-2 py-0.5 font-bold text-amber-200">
+                      <span className="shrink-0 rounded-full bg-amber-400/20 px-2 py-0.5 font-bold text-amber-200">
                         Cerrado
                       </span>
                     ) : null}

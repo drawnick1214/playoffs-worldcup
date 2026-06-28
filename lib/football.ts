@@ -73,6 +73,7 @@ export interface MatchRow {
   home_team_crest: string | null;
   away_team_crest: string | null;
   kickoff_utc: string | null;
+  venue: string | null;
   status: string | null;
   reg_home: number | null;
   reg_away: number | null;
@@ -167,7 +168,54 @@ export function mapMatch(m: FdMatch): MatchRow | null {
     home_team_crest: m.homeTeam?.crest ?? null,
     away_team_crest: m.awayTeam?.crest ?? null,
     kickoff_utc: m.utcDate ?? null,
+    venue: null, // filled from openfootball in the sync step
     status: m.status,
     ...scored,
   };
 }
+
+// ---------------------------------------------------------------------------
+// Venues — football-data's free tier omits the stadium, so we pull the venue
+// from the open public openfootball dataset and join by exact kickoff time.
+// ---------------------------------------------------------------------------
+
+const OPENFOOTBALL_URL =
+  "https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json";
+
+const KNOCKOUT_ROUNDS = new Set([
+  "Round of 32",
+  "Round of 16",
+  "Quarter-final",
+  "Semi-final",
+  "Match for third place",
+  "Final",
+]);
+
+function openfootballToUtc(date: string, time: string): string | null {
+  const m = time.match(/(\d{1,2}):(\d{2})\s*UTC([+-]\d{1,2})/);
+  if (!m) return null;
+  const sign = m[3][0];
+  const hours = m[3].slice(1).padStart(2, "0");
+  const off = `${sign}${hours}:00`;
+  const iso = `${date}T${m[1].padStart(2, "0")}:${m[2]}:00${off}`;
+  const d = new Date(iso);
+  return isNaN(d.getTime()) ? null : d.toISOString();
+}
+
+/** Map of kickoff time (ISO UTC) -> venue, for knockout matches. */
+export async function fetchVenueMap(): Promise<Record<string, string>> {
+  const res = await fetch(OPENFOOTBALL_URL, { cache: "no-store" });
+  if (!res.ok) return {};
+  const data = (await res.json()) as {
+    matches?: { round?: string; date?: string; time?: string; ground?: string }[];
+  };
+  const map: Record<string, string> = {};
+  for (const m of data.matches ?? []) {
+    if (!m.round || !KNOCKOUT_ROUNDS.has(m.round)) continue;
+    if (!m.date || !m.time || !m.ground) continue;
+    const key = openfootballToUtc(m.date, m.time);
+    if (key) map[key] = m.ground;
+  }
+  return map;
+}
+

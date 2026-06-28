@@ -30,6 +30,7 @@ create table if not exists matches (
   home_team_crest text,                          -- URL del escudo/bandera
   away_team_crest text,
   kickoff_utc    timestamptz,
+  venue          text,                            -- sede/lugar del partido
   status         text,                            -- SCHEDULED/TIMED/IN_PLAY/FINISHED...
   reg_home       int,                             -- regulation (90') goals, home
   reg_away       int,                             -- regulation (90') goals, away
