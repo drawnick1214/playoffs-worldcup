@@ -7,6 +7,7 @@ import type { Match, Prediction } from "@/lib/types";
 import PredictionForm from "@/components/PredictionForm";
 import LogoutButton from "@/components/LogoutButton";
 import TeamName from "@/components/TeamName";
+import PredictionsList, { type RevealRow } from "@/components/PredictionsList";
 
 export const dynamic = "force-dynamic";
 
@@ -18,18 +19,18 @@ export default async function HomePage() {
   const user = await requireUser();
   const supabase = db();
 
-  const [{ data: matchesRaw }, { data: myPredsRaw }, { data: usersRaw }, { data: allPredsRaw }] =
-    await Promise.all([
-      supabase.from("matches").select("*"),
-      supabase.from("predictions").select("*").eq("user_id", user.id),
-      supabase.from("users").select("id, display_name"),
-      supabase.from("predictions").select("user_id, points"),
-    ]);
+  const [{ data: matchesRaw }, { data: usersRaw }, { data: allPredsRaw }] = await Promise.all([
+    supabase.from("matches").select("*"),
+    supabase.from("users").select("id, display_name"),
+    supabase.from("predictions").select("*"),
+  ]);
 
   const matches = (matchesRaw ?? []) as Match[];
-  const myPreds = (myPredsRaw ?? []) as Prediction[];
   const users = (usersRaw ?? []) as { id: string; display_name: string }[];
-  const allPreds = (allPredsRaw ?? []) as { user_id: string; points: number | null }[];
+  const allPreds = (allPredsRaw ?? []) as Prediction[];
+
+  const nameById = new Map<string, string>();
+  for (const u of users) nameById.set(u.id, u.display_name);
 
   // ----- Leaderboard -----
   const totals = new Map<string, number>();
@@ -41,9 +42,15 @@ export default async function HomePage() {
     .map((u) => ({ ...u, points: totals.get(u.id) ?? 0 }))
     .sort((a, b) => b.points - a.points || a.display_name.localeCompare(b.display_name));
 
-  // ----- Predictions by match -----
-  const predByMatch = new Map<string, Prediction>();
-  for (const p of myPreds) predByMatch.set(p.match_id, p);
+  // ----- Predictions indexed by match -----
+  const predByMatch = new Map<string, Prediction>(); // my own
+  const allByMatch = new Map<string, Prediction[]>(); // everyone (revealed only after kickoff)
+  for (const p of allPreds) {
+    if (p.user_id === user.id) predByMatch.set(p.match_id, p);
+    const list = allByMatch.get(p.match_id) ?? [];
+    list.push(p);
+    allByMatch.set(p.match_id, list);
+  }
 
   // ----- Group matches by stage, sorted -----
   const sorted = [...matches].sort((a, b) => {
@@ -154,6 +161,19 @@ export default async function HomePage() {
               const locked = isLocked(m.kickoff_utc);
               const predictable = teamsKnown && !locked && !finished;
 
+              // Reveal everyone's predictions only once the match is locked (kickoff passed).
+              const revealRows: RevealRow[] =
+                locked || finished
+                  ? (allByMatch.get(m.id) ?? []).map((p) => ({
+                      name: nameById.get(p.user_id) ?? "Jugador",
+                      home: p.pred_home,
+                      away: p.pred_away,
+                      penWinner: p.pred_pen_winner,
+                      points: p.points,
+                      isMe: p.user_id === user.id,
+                    }))
+                  : [];
+
               return (
                 <div
                   key={m.id}
@@ -190,29 +210,12 @@ export default async function HomePage() {
                           {m.pen_winner === "HOME" ? teamName(m.home_team) : teamName(m.away_team)}
                         </div>
                       )}
-                      <div className="mt-2 text-sm text-white/75">
-                        {pred ? (
-                          <>
-                            Tu predicción: {pred.pred_home} - {pred.pred_away}
-                            {pred.pred_home === pred.pred_away && pred.pred_pen_winner && (
-                              <>
-                                {" "}
-                                (penales:{" "}
-                                {pred.pred_pen_winner === "HOME"
-                                  ? teamName(m.home_team)
-                                  : teamName(m.away_team)}
-                                )
-                              </>
-                            )}{" "}
-                            ·{" "}
-                            <span className="rounded-full bg-emerald-400/20 px-2 py-0.5 font-bold text-emerald-100">
-                              {pred.points ?? 0} pts
-                            </span>
-                          </>
-                        ) : (
-                          <span className="text-white/50">No predijiste este partido.</span>
-                        )}
-                      </div>
+                      <PredictionsList
+                        rows={revealRows}
+                        homeTeam={teamName(m.home_team)}
+                        awayTeam={teamName(m.away_team)}
+                        showPoints
+                      />
                     </div>
                   )}
 
@@ -232,27 +235,14 @@ export default async function HomePage() {
                     />
                   )}
 
-                  {/* Locked (not finished) */}
+                  {/* Locked (not finished): reveal everyone's predictions */}
                   {!finished && locked && teamsKnown && (
-                    <div className="mt-2 text-center text-sm text-white/75">
-                      {pred ? (
-                        <>
-                          Tu predicción: {pred.pred_home} - {pred.pred_away}
-                          {pred.pred_home === pred.pred_away && pred.pred_pen_winner && (
-                            <>
-                              {" "}
-                              (penales:{" "}
-                              {pred.pred_pen_winner === "HOME"
-                                ? teamName(m.home_team)
-                                : teamName(m.away_team)}
-                              )
-                            </>
-                          )}
-                        </>
-                      ) : (
-                        <span className="text-white/50">No alcanzaste a predecir.</span>
-                      )}
-                    </div>
+                    <PredictionsList
+                      rows={revealRows}
+                      homeTeam={teamName(m.home_team)}
+                      awayTeam={teamName(m.away_team)}
+                      showPoints={false}
+                    />
                   )}
 
                   {/* Teams not known yet */}
