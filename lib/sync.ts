@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { fetchWorldCupMatches, fetchVenueMap, mapMatch } from "./football";
+import { fetchWorldCupMatches, fetchOpenfootballMap, mapMatch, type OpenfootballInfo } from "./football";
 import { scorePrediction } from "./scoring";
 import type { Match, Prediction } from "./types";
 
@@ -18,9 +18,9 @@ export async function runSync(): Promise<SyncResult> {
   const supabase = db();
 
   // 1. Fetch + map knockout matches, plus venues from openfootball (best-effort).
-  const [fdMatches, venueMap] = await Promise.all([
+  const [fdMatches, ofMap] = await Promise.all([
     fetchWorldCupMatches(),
-    fetchVenueMap().catch(() => ({} as Record<string, string>)),
+    fetchOpenfootballMap().catch(() => ({}) as Record<string, OpenfootballInfo>),
   ]);
   // Matches already FINISHED in our DB are frozen: we never overwrite their
   // result fields again (protects manual admin corrections and locked results).
@@ -36,7 +36,7 @@ export async function runSync(): Promise<SyncResult> {
     .filter((r) => !frozen.has(r.external_id))
     .map((r) => {
       const key = r.kickoff_utc ? new Date(r.kickoff_utc).toISOString() : null;
-      return { ...r, venue: (key && venueMap[key]) || r.venue };
+      return { ...r, venue: (key && ofMap[key]?.venue) || r.venue };
     });
 
   // 2. Upsert (by external_id). `scored` is never in the payload, so the flag
@@ -47,6 +47,11 @@ export async function runSync(): Promise<SyncResult> {
     if (error) throw new Error(`Error al guardar partidos: ${error.message}`);
   }
 
+  // 3. Backfill the 90' score for finished draws (extra time / penalties), taken
+  //    from openfootball's goal-by-goal data. This lets the exact-score be graded
+  //    automatically without the admin entering anything by hand.
+  await backfill90Scores(ofMap);
+
   const scored = await scoreFinishedMatches();
 
   return {
@@ -54,6 +59,32 @@ export async function runSync(): Promise<SyncResult> {
     scoredMatches: scored.scoredMatches,
     scoredPredictions: scored.scoredPredictions,
   };
+}
+
+/**
+ * Fill in the 90' scoreline for finished draws (extra time / penalties) whose
+ * regulation score is still unknown, using openfootball's goal-by-goal data.
+ * Only applies a draw scoreline (home === away). Sets scored=false to re-grade.
+ */
+async function backfill90Scores(ofMap: Record<string, OpenfootballInfo>): Promise<void> {
+  const supabase = db();
+  const { data: pending } = await supabase
+    .from("matches")
+    .select("id, kickoff_utc")
+    .eq("status", "FINISHED")
+    .eq("drew_at_90", true)
+    .is("reg_home", null);
+
+  for (const m of pending ?? []) {
+    const key = m.kickoff_utc ? new Date(m.kickoff_utc as string).toISOString() : null;
+    const reg90 = key ? ofMap[key]?.reg90 : undefined;
+    if (reg90 && reg90.home === reg90.away) {
+      await supabase
+        .from("matches")
+        .update({ reg_home: reg90.home, reg_away: reg90.away, scored: false })
+        .eq("id", m.id);
+    }
+  }
 }
 
 /** Score every finished-but-unscored match. Shared by sync and manual admin override. */

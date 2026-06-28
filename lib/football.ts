@@ -120,9 +120,9 @@ function deriveScore(m: FdMatch): Pick<
   // The marcador only counts the 90 regulation minutes. A match that goes beyond
   // 90' was a draw in regulation. football-data's `fullTime` for those matches
   // includes extra-time goals, so we CANNOT trust it as the 90' scoreline — we
-  // therefore leave the 90' score unknown (null) and only award the result point
-  // (DRAW) plus the "who advances" bonus. The admin can enter the exact 90'
-  // score manually in /admin if they want the exact-score point to count.
+  // leave the 90' score null here. The sync then fills it in automatically from
+  // openfootball's goal-by-goal data (see backfill90Scores) so the exact-score
+  // can still be graded without any manual entry.
   const drewAt90 = s.duration === "EXTRA_TIME" || s.duration === "PENALTY_SHOOTOUT";
 
   if (drewAt90) {
@@ -207,19 +207,59 @@ function openfootballToUtc(date: string, time: string): string | null {
   return isNaN(d.getTime()) ? null : d.toISOString();
 }
 
-/** Map of kickoff time (ISO UTC) -> venue, for knockout matches. */
-export async function fetchVenueMap(): Promise<Record<string, string>> {
+interface Goal {
+  minute?: string | number;
+}
+
+export interface OpenfootballInfo {
+  venue?: string;
+  /** Score at the 90' mark (goals in minutes 1–90, stoppage included). */
+  reg90?: { home: number; away: number };
+}
+
+/** Count goals scored within the 90 regulation minutes (stoppage like 90+4 counts). */
+function goalsBy90(goals: Goal[] | undefined): number {
+  if (!Array.isArray(goals)) return 0;
+  let n = 0;
+  for (const g of goals) {
+    const min = parseInt(String(g.minute ?? "").split("+")[0], 10);
+    if (!isNaN(min) && min <= 90) n++;
+  }
+  return n;
+}
+
+/**
+ * Map of kickoff time (ISO UTC) -> { venue, 90' score } for knockout matches.
+ * The 90' score is computed from openfootball's goal-by-goal data so we can grade
+ * the exact-score even when a match went to extra time / penalties.
+ */
+export async function fetchOpenfootballMap(): Promise<Record<string, OpenfootballInfo>> {
   const res = await fetch(OPENFOOTBALL_URL, { cache: "no-store" });
   if (!res.ok) return {};
   const data = (await res.json()) as {
-    matches?: { round?: string; date?: string; time?: string; ground?: string }[];
+    matches?: {
+      round?: string;
+      date?: string;
+      time?: string;
+      ground?: string;
+      score?: { ft?: number[] };
+      goals1?: Goal[];
+      goals2?: Goal[];
+    }[];
   };
-  const map: Record<string, string> = {};
+  const map: Record<string, OpenfootballInfo> = {};
   for (const m of data.matches ?? []) {
     if (!m.round || !KNOCKOUT_ROUNDS.has(m.round)) continue;
-    if (!m.date || !m.time || !m.ground) continue;
+    if (!m.date || !m.time) continue;
     const key = openfootballToUtc(m.date, m.time);
-    if (key) map[key] = m.ground;
+    if (!key) continue;
+    const info: OpenfootballInfo = {};
+    if (m.ground) info.venue = m.ground;
+    // Only when the match has been played (has a final score).
+    if (m.score?.ft) {
+      info.reg90 = { home: goalsBy90(m.goals1), away: goalsBy90(m.goals2) };
+    }
+    map[key] = info;
   }
   return map;
 }
