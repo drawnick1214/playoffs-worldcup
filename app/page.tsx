@@ -136,22 +136,47 @@ export default async function HomePage() {
   const prediccionNode = (
     <div>
       {/* Rules (collapsible) */}
-      <details className="mb-4 rounded-xl border border-white/20 bg-white/10 p-3 text-sm text-white/80 backdrop-blur">
-        <summary className="cursor-pointer font-bold text-white">📋 Reglas y puntaje</summary>
-        <ul className="mt-2 list-disc space-y-1 pl-5">
+      <details className="mb-4 rounded-xl border border-white/20 bg-white/10 p-4 text-sm text-white/80 backdrop-blur">
+        <summary className="cursor-pointer font-bold text-white">📋 Reglas — cómo se juega</summary>
+
+        <p className="mt-3 font-semibold text-white">⚽ Cómo se juega</p>
+        <ul className="mt-1 list-disc space-y-1 pl-5">
+          <li>Predice el <strong>marcador</strong> de cada partido de las eliminatorias.</li>
           <li>
-            El marcador cuenta <strong>solo los 90 minutos</strong> reglamentarios. La prórroga
-            <strong> no</strong> cuenta para el marcador.
+            Puedes <strong>editar</strong> tu predicción hasta <strong>15 minutos antes</strong> del
+            inicio del partido. Después queda bloqueada.
           </li>
-          <li>Marcador exacto (a los 90&apos;): <strong>4 puntos</strong></li>
-          <li>Resultado correcto (ganador o empate a los 90&apos;): <strong>1 punto</strong></li>
           <li>
-            Si el partido queda <strong>empatado</strong> a los 90&apos;, eliges <strong>qué equipo
-            pasa</strong> (sea por prórroga o penales). Acertar quién pasa: <strong>+1 punto</strong>
+            Tus predicciones son <strong>privadas</strong>: nadie las ve hasta que el partido se
+            cierra. Ahí se revelan las de todos.
           </li>
-          <li>Cada predicción se <strong>cierra 15 minutos antes</strong> de empezar el partido.</li>
-          <li>Las predicciones de todos se revelan una vez cerrado el partido.</li>
         </ul>
+
+        <p className="mt-3 font-semibold text-white">
+          🏅 Puntos <span className="font-normal text-white/60">(solo cuentan los 90 minutos; la prórroga NO)</span>
+        </p>
+        <ul className="mt-1 list-disc space-y-1 pl-5">
+          <li><strong>4 pts</strong> — Marcador exacto. <span className="text-white/60">Ej: pones 2-1 y queda 2-1.</span></li>
+          <li><strong>1 pt</strong> — Aciertas solo el resultado (quién gana o empate), con marcador distinto. <span className="text-white/60">Ej: pones 3-0 y queda 2-1 → acertaste que ganaba el local.</span></li>
+          <li><strong>0 pts</strong> — No aciertas el resultado.</li>
+        </ul>
+
+        <p className="mt-3 font-semibold text-white">🤝 Empates y quién pasa</p>
+        <ul className="mt-1 list-disc space-y-1 pl-5">
+          <li>
+            Un <strong>empate</strong> se refiere al marcador de los <strong>90 minutos</strong>. Los
+            goles de la prórroga no cuentan.
+          </li>
+          <li>Si predices empate, además eliges <strong>qué equipo crees que pasa</strong> (por prórroga o penales).</li>
+          <li>
+            Si el partido queda empatado a los 90&apos; y aciertas quién pasa:
+            <strong> +1 punto extra</strong>.
+          </li>
+        </ul>
+
+        <p className="mt-3 text-xs text-white/60">
+          Gana la polla quien acumule más puntos. Mira tu posición en la pestaña 🏆 Leaderboard.
+        </p>
       </details>
 
       <p className="mb-4 text-center text-xs text-white/70">
