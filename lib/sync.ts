@@ -22,9 +22,18 @@ export async function runSync(): Promise<SyncResult> {
     fetchWorldCupMatches(),
     fetchVenueMap().catch(() => ({} as Record<string, string>)),
   ]);
+  // Matches already FINISHED in our DB are frozen: we never overwrite their
+  // result fields again (protects manual admin corrections and locked results).
+  const { data: finishedRows } = await supabase
+    .from("matches")
+    .select("external_id")
+    .eq("status", "FINISHED");
+  const frozen = new Set((finishedRows ?? []).map((m) => m.external_id as string));
+
   const rows = fdMatches
     .map(mapMatch)
     .filter((r): r is NonNullable<typeof r> => r !== null)
+    .filter((r) => !frozen.has(r.external_id))
     .map((r) => {
       const key = r.kickoff_utc ? new Date(r.kickoff_utc).toISOString() : null;
       return { ...r, venue: (key && venueMap[key]) || r.venue };

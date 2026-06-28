@@ -23,7 +23,9 @@ test("wrong result = 0", () => {
   assert.equal(scorePrediction(m, { pred_home: 0, pred_away: 2, pred_advance_winner: null }), 0);
 });
 
-test("exact tie + correct advancing team (penalties) = 5", () => {
+test("draw with known 90' score (admin-entered) + correct advancing team = 5", () => {
+  // Only happens when the admin manually enters the 90' scoreline; the API never
+  // sets a 90' score for matches that went to extra time / penalties.
   const m = { reg_home: 1, reg_away: 1, result: "DRAW" as const, drew_at_90: true, advance_winner: "AWAY" as const };
   assert.equal(scorePrediction(m, { pred_home: 1, pred_away: 1, pred_advance_winner: "AWAY" as const }), 5);
 });

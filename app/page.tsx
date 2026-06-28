@@ -139,11 +139,15 @@ export default async function HomePage() {
       <details className="mb-4 rounded-xl border border-white/20 bg-white/10 p-3 text-sm text-white/80 backdrop-blur">
         <summary className="cursor-pointer font-bold text-white">📋 Reglas y puntaje</summary>
         <ul className="mt-2 list-disc space-y-1 pl-5">
+          <li>
+            El marcador cuenta <strong>solo los 90 minutos</strong> reglamentarios. La prórroga
+            <strong> no</strong> cuenta para el marcador.
+          </li>
           <li>Marcador exacto (a los 90&apos;): <strong>4 puntos</strong></li>
           <li>Resultado correcto (ganador o empate a los 90&apos;): <strong>1 punto</strong></li>
           <li>
-            Si predices empate, elige <strong>qué equipo pasa</strong> a la siguiente ronda. Acertar
-            quién pasa: <strong>+1 punto</strong>
+            Si el partido queda <strong>empatado</strong> a los 90&apos;, eliges <strong>qué equipo
+            pasa</strong> (sea por prórroga o penales). Acertar quién pasa: <strong>+1 punto</strong>
           </li>
           <li>Cada predicción se <strong>cierra 15 minutos antes</strong> de empezar el partido.</li>
           <li>Las predicciones de todos se revelan una vez cerrado el partido.</li>

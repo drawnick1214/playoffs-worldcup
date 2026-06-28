@@ -117,17 +117,18 @@ function deriveScore(m: FdMatch): Pick<
   const s = m.score;
   const home = s.fullTime?.home ?? null;
   const away = s.fullTime?.away ?? null;
-  // A draw at 90' is exactly when the match went beyond regular time.
+  // The marcador only counts the 90 regulation minutes. A match that goes beyond
+  // 90' was a draw in regulation. football-data's `fullTime` for those matches
+  // includes extra-time goals, so we CANNOT trust it as the 90' scoreline — we
+  // therefore leave the 90' score unknown (null) and only award the result point
+  // (DRAW) plus the "who advances" bonus. The admin can enter the exact 90'
+  // score manually in /admin if they want the exact-score point to count.
   const drewAt90 = s.duration === "EXTRA_TIME" || s.duration === "PENALTY_SHOOTOUT";
 
   if (drewAt90) {
-    // Level after 90'. The overall winner is the team that advanced.
-    // For penalty shootouts fullTime is the (level) 90' score; for extra time
-    // fullTime includes extra-time goals, so the 90' scoreline is unknown.
-    const reg = s.duration === "PENALTY_SHOOTOUT" ? { home, away } : { home: null, away: null };
     return {
-      reg_home: reg.home,
-      reg_away: reg.away,
+      reg_home: null,
+      reg_away: null,
       result: "DRAW",
       drew_at_90: true,
       advance_winner: s.winner === "AWAY_TEAM" ? "AWAY" : "HOME",
