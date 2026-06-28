@@ -2,6 +2,15 @@
 
 App sencilla para que 5 amigos predigan los **playoffs (eliminatorias) del Mundial 2026** y compitan en una tabla de posiciones. Los resultados oficiales se traen **automáticamente** desde [football-data.org] y los puntos se actualizan apenas termina cada partido. Horas en zona **America/Bogotá**, interfaz en **español**.
 
+## ✅ Estado: desplegado y funcionando
+
+- **App en vivo:** https://playoffsworldcup.vercel.app
+- **Repo:** https://github.com/drawnick1214/playoffs-worldcup
+- **Base de datos:** Supabase (proyecto `playoffs-worldcup`)
+- **Sincronización automática:** un job `pg_cron` dentro de Supabase llama a `/api/sync` cada 5 minutos (no se usa servicio externo).
+
+> ⚠️ Pendiente: los 5 jugadores tienen **usuarios/contraseñas de ejemplo** (`jugador1`…`jugador5`, claves `cambiar-1`…`cambiar-5`, `jugador1` es admin). Cámbialos por los reales (ver "Cambiar usuarios/contraseñas" abajo).
+
 ## Cómo se puntúa
 
 - **Marcador exacto:** 4 puntos (3 por el marcador + 1 por el resultado).
@@ -45,12 +54,29 @@ App sencilla para que 5 amigos predigan los **playoffs (eliminatorias) del Mundi
    - `SYNC_TOKEN` → otro texto aleatorio
 4. **Deploy**. Tendrás una URL tipo `https://tu-app.vercel.app`.
 
-### 4. Actualización automática de resultados (cron gratis)
-Vercel gratis solo permite cron 1 vez al día, así que usamos un pinger externo:
-1. Crea una cuenta gratis en <https://cron-job.org>.
-2. **Create cronjob** apuntando a:
-   `https://tu-app.vercel.app/api/sync?token=EL_VALOR_DE_SYNC_TOKEN`
-3. Frecuencia: **cada 5 minutos**. Eso trae nuevos partidos y reparte puntos apenas terminan.
+### 4. Actualización automática de resultados (ya configurada con pg_cron)
+En vez de un servicio externo, esta instalación usa **pg_cron + pg_net** dentro de Supabase para llamar `/api/sync` cada 5 minutos. El job ya quedó creado:
+
+```sql
+-- Ver el job
+select * from cron.job where jobname = 'quiniela-sync';
+-- Ver ejecuciones recientes
+select * from cron.job_run_details order by start_time desc limit 10;
+```
+
+Alternativa (si prefieres un pinger externo): crea un cronjob gratis en <https://cron-job.org> apuntando a
+`https://playoffsworldcup.vercel.app/api/sync?token=<SYNC_TOKEN>` cada 5 minutos.
+
+### Cambiar usuarios/contraseñas
+En Supabase → **SQL Editor**, por cada jugador:
+
+```sql
+update users
+set username = 'nombre_real',
+    display_name = 'Nombre Visible',
+    password_hash = crypt('su-clave', gen_salt('bf', 10))
+where username = 'jugador1';
+```
 
 ### 5. Compartir
 Pásale a cada amigo la URL y su **usuario + contraseña**.
