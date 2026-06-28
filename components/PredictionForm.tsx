@@ -6,6 +6,8 @@ interface Props {
   matchId: string;
   homeTeam: string;
   awayTeam: string;
+  homeCrest?: string | null;
+  awayCrest?: string | null;
   initial: {
     pred_home: number | null;
     pred_away: number | null;
@@ -13,7 +15,14 @@ interface Props {
   };
 }
 
-export default function PredictionForm({ matchId, homeTeam, awayTeam, initial }: Props) {
+export default function PredictionForm({
+  matchId,
+  homeTeam,
+  awayTeam,
+  homeCrest,
+  awayCrest,
+  initial,
+}: Props) {
   const [home, setHome] = useState(initial.pred_home?.toString() ?? "");
   const [away, setAway] = useState(initial.pred_away?.toString() ?? "");
   const [pen, setPen] = useState<"HOME" | "AWAY" | "">(initial.pred_pen_winner ?? "");
@@ -65,7 +74,13 @@ export default function PredictionForm({ matchId, homeTeam, awayTeam, initial }:
   return (
     <div className="mt-3">
       <div className="flex items-center justify-center gap-3">
-        <span className="w-28 text-right text-sm font-medium">{homeTeam}</span>
+        <span className="flex w-28 items-center justify-end gap-1.5 text-right text-sm font-medium">
+          {homeCrest && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={homeCrest} alt="" className="inline-block h-4 w-5 shrink-0 object-contain" />
+          )}
+          {homeTeam}
+        </span>
         <input
           type="number"
           min={0}
@@ -91,7 +106,13 @@ export default function PredictionForm({ matchId, homeTeam, awayTeam, initial }:
           }}
           className="w-12 rounded-md border border-slate-700 bg-slate-800 py-1 text-center text-lg"
         />
-        <span className="w-28 text-left text-sm font-medium">{awayTeam}</span>
+        <span className="flex w-28 items-center justify-start gap-1.5 text-left text-sm font-medium">
+          {awayTeam}
+          {awayCrest && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={awayCrest} alt="" className="inline-block h-4 w-5 shrink-0 object-contain" />
+          )}
+        </span>
       </div>
 
       {isTie && (

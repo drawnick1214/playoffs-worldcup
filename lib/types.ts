@@ -17,6 +17,8 @@ export interface Match {
   away_team: string | null;
   home_team_code: string | null;
   away_team_code: string | null;
+  home_team_crest: string | null;
+  away_team_crest: string | null;
   kickoff_utc: string | null;
   status: string | null;
   reg_home: number | null;

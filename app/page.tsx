@@ -6,6 +6,7 @@ import { STAGE_ORDER, stageLabel } from "@/lib/football";
 import type { Match, Prediction } from "@/lib/types";
 import PredictionForm from "@/components/PredictionForm";
 import LogoutButton from "@/components/LogoutButton";
+import TeamName from "@/components/TeamName";
 
 export const dynamic = "force-dynamic";
 
@@ -88,22 +89,34 @@ export default async function HomePage() {
       {/* Leaderboard */}
       <section className="mb-8 rounded-2xl border border-slate-800 bg-slate-900 p-4">
         <h2 className="mb-3 text-lg font-semibold">🏆 Tabla de posiciones</h2>
-        <ol className="space-y-1">
-          {leaderboard.map((u, i) => (
-            <li
-              key={u.id}
-              className={`flex items-center justify-between rounded-lg px-3 py-2 ${
-                u.id === user.id ? "bg-emerald-950/50" : ""
-              }`}
-            >
-              <span>
-                <span className="mr-2 inline-block w-6 text-slate-500">{i + 1}.</span>
-                {u.display_name}
-              </span>
-              <span className="font-semibold">{u.points} pts</span>
-            </li>
-          ))}
-        </ol>
+        {leaderboard.length === 0 ? (
+          <p className="px-1 text-sm text-slate-400">
+            Aún no hay jugadores. Comparte el enlace para que se registren.
+          </p>
+        ) : (
+          <ol className="space-y-1">
+            {leaderboard.map((u, i) => {
+              const medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : null;
+              return (
+                <li
+                  key={u.id}
+                  className={`flex items-center justify-between rounded-lg px-3 py-2 ${
+                    u.id === user.id ? "bg-emerald-950/50" : ""
+                  }`}
+                >
+                  <span className="flex items-center">
+                    <span className="mr-2 inline-block w-6 text-center text-slate-500">
+                      {medal ?? `${i + 1}.`}
+                    </span>
+                    {u.display_name}
+                    {u.id === user.id && <span className="ml-2 text-xs text-emerald-400">(tú)</span>}
+                  </span>
+                  <span className="font-semibold">{u.points} pts</span>
+                </li>
+              );
+            })}
+          </ol>
+        )}
       </section>
 
       {/* Rules */}
@@ -146,9 +159,10 @@ export default async function HomePage() {
                     ) : null}
                   </div>
 
-                  <div className="mt-1 text-center text-base font-semibold">
-                    {teamName(m.home_team)} <span className="text-slate-500">vs</span>{" "}
-                    {teamName(m.away_team)}
+                  <div className="mt-1 flex items-center justify-center gap-2 text-base font-semibold">
+                    <TeamName name={teamName(m.home_team)} crest={m.home_team_crest} />
+                    <span className="text-slate-500">vs</span>
+                    <TeamName name={teamName(m.away_team)} crest={m.away_team_crest} reverse />
                   </div>
 
                   {/* Finished: real result + my prediction + points */}
@@ -195,6 +209,8 @@ export default async function HomePage() {
                       matchId={m.id}
                       homeTeam={teamName(m.home_team)}
                       awayTeam={teamName(m.away_team)}
+                      homeCrest={m.home_team_crest}
+                      awayCrest={m.away_team_crest}
                       initial={{
                         pred_home: pred?.pred_home ?? null,
                         pred_away: pred?.pred_away ?? null,

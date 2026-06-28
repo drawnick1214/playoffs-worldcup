@@ -41,6 +41,7 @@ export function stageLabel(stage: string | null | undefined): string {
 interface FdTeam {
   name: string | null;
   tla: string | null;
+  crest: string | null;
 }
 
 interface FdScore {
@@ -69,6 +70,8 @@ export interface MatchRow {
   away_team: string | null;
   home_team_code: string | null;
   away_team_code: string | null;
+  home_team_crest: string | null;
+  away_team_crest: string | null;
   kickoff_utc: string | null;
   status: string | null;
   reg_home: number | null;
@@ -161,6 +164,8 @@ export function mapMatch(m: FdMatch): MatchRow | null {
     away_team: m.awayTeam?.name ?? null,
     home_team_code: m.homeTeam?.tla ?? null,
     away_team_code: m.awayTeam?.tla ?? null,
+    home_team_crest: m.homeTeam?.crest ?? null,
+    away_team_crest: m.awayTeam?.crest ?? null,
     kickoff_utc: m.utcDate ?? null,
     status: m.status,
     ...scored,
