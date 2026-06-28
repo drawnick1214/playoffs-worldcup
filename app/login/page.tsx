@@ -45,21 +45,27 @@ export default function LoginPage() {
     setError("");
   }
 
+  const inputCls =
+    "w-full rounded-lg border border-white/25 bg-white/15 px-3 py-2 text-white placeholder-white/50 outline-none transition focus:border-amber-300 focus:bg-white/20";
+
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-950 px-4 text-slate-100">
+    <main className="flex min-h-screen items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold">⚽ Quiniela Mundial 2026</h1>
-          <p className="mt-2 text-sm text-slate-400">Predice los playoffs y compite con tus amigos.</p>
+          <div className="text-5xl">⚽🏆</div>
+          <h1 className="mt-2 text-3xl font-black uppercase tracking-tight drop-shadow">
+            Polla Playoffs <span className="text-amber-300">del Mundial</span>
+          </h1>
+          <p className="mt-2 text-sm text-white/80">Predice los playoffs y compite con tus amigos.</p>
         </div>
 
         {/* Tabs */}
-        <div className="mb-4 grid grid-cols-2 gap-1 rounded-xl bg-slate-900 p-1">
+        <div className="mb-4 grid grid-cols-2 gap-1 rounded-xl bg-white/10 p-1 backdrop-blur">
           <button
             type="button"
             onClick={() => switchMode("login")}
-            className={`rounded-lg py-2 text-sm font-medium transition ${
-              mode === "login" ? "bg-emerald-600 text-white" : "text-slate-300 hover:bg-slate-800"
+            className={`rounded-lg py-2 text-sm font-bold transition ${
+              mode === "login" ? "bg-amber-400 text-slate-900" : "text-white/80 hover:bg-white/10"
             }`}
           >
             Entrar
@@ -67,8 +73,8 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => switchMode("register")}
-            className={`rounded-lg py-2 text-sm font-medium transition ${
-              mode === "register" ? "bg-emerald-600 text-white" : "text-slate-300 hover:bg-slate-800"
+            className={`rounded-lg py-2 text-sm font-bold transition ${
+              mode === "register" ? "bg-amber-400 text-slate-900" : "text-white/80 hover:bg-white/10"
             }`}
           >
             Crear cuenta
@@ -77,49 +83,49 @@ export default function LoginPage() {
 
         <form
           onSubmit={onSubmit}
-          className="space-y-4 rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-xl"
+          className="space-y-4 rounded-2xl border border-white/20 bg-white/10 p-6 shadow-2xl backdrop-blur-md"
         >
           {mode === "register" && (
             <div>
-              <label className="mb-1 block text-sm font-medium text-slate-300">
-                Tu nombre <span className="text-slate-500">(aparece en la tabla)</span>
+              <label className="mb-1 block text-sm font-semibold text-white/90">
+                Tu nombre <span className="text-white/50">(aparece en la tabla)</span>
               </label>
               <input
                 type="text"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 placeholder="Ej. Edward"
-                className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-slate-100 outline-none focus:border-emerald-500"
+                className={inputCls}
               />
             </div>
           )}
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-300">Usuario</label>
+            <label className="mb-1 block text-sm font-semibold text-white/90">Usuario</label>
             <input
               type="text"
               autoCapitalize="none"
               autoCorrect="off"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-slate-100 outline-none focus:border-emerald-500"
+              className={inputCls}
               required
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-slate-300">Contraseña</label>
+            <label className="mb-1 block text-sm font-semibold text-white/90">Contraseña</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-slate-100 outline-none focus:border-emerald-500"
+              className={inputCls}
               required
             />
           </div>
-          {error && <p className="text-sm text-red-400">{error}</p>}
+          {error && <p className="rounded-lg bg-red-500/20 px-3 py-2 text-sm text-red-100">{error}</p>}
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-emerald-600 px-4 py-2 font-semibold text-white transition hover:bg-emerald-500 disabled:opacity-50"
+            className="w-full rounded-lg bg-amber-400 px-4 py-2.5 font-black uppercase tracking-wide text-slate-900 shadow-lg transition hover:bg-amber-300 disabled:opacity-50"
           >
             {loading
               ? mode === "login"
@@ -130,7 +136,7 @@ export default function LoginPage() {
                 : "Crear cuenta"}
           </button>
           {mode === "register" && (
-            <p className="text-center text-xs text-slate-500">
+            <p className="text-center text-xs text-white/60">
               Crea tu usuario una sola vez. Luego entras con esos mismos datos.
             </p>
           )}

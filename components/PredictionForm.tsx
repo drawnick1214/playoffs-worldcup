@@ -91,9 +91,9 @@ export default function PredictionForm({
             setHome(e.target.value);
             setStatus("idle");
           }}
-          className="w-12 rounded-md border border-slate-700 bg-slate-800 py-1 text-center text-lg"
+          className="w-12 rounded-md border border-white/30 bg-white/20 py-1 text-center text-lg text-white outline-none focus:border-amber-300"
         />
-        <span className="text-slate-500">-</span>
+        <span className="text-white/50">-</span>
         <input
           type="number"
           min={0}
@@ -104,7 +104,7 @@ export default function PredictionForm({
             setAway(e.target.value);
             setStatus("idle");
           }}
-          className="w-12 rounded-md border border-slate-700 bg-slate-800 py-1 text-center text-lg"
+          className="w-12 rounded-md border border-white/30 bg-white/20 py-1 text-center text-lg text-white outline-none focus:border-amber-300"
         />
         <span className="flex w-28 items-center justify-start gap-1.5 text-left text-sm font-medium">
           {awayTeam}
@@ -117,7 +117,7 @@ export default function PredictionForm({
 
       {isTie && (
         <div className="mt-3 text-center">
-          <p className="mb-1 text-xs text-amber-300">Empate: ¿quién gana en penales?</p>
+          <p className="mb-1 text-xs font-semibold text-amber-200">Empate: ¿quién gana en penales?</p>
           <div className="flex justify-center gap-2">
             <button
               type="button"
@@ -125,8 +125,8 @@ export default function PredictionForm({
                 setPen("HOME");
                 setStatus("idle");
               }}
-              className={`rounded-md px-3 py-1 text-sm ${
-                pen === "HOME" ? "bg-emerald-600 text-white" : "bg-slate-800 text-slate-300"
+              className={`rounded-md px-3 py-1 text-sm font-semibold transition ${
+                pen === "HOME" ? "bg-amber-400 text-slate-900" : "bg-white/15 text-white hover:bg-white/25"
               }`}
             >
               {homeTeam}
@@ -137,8 +137,8 @@ export default function PredictionForm({
                 setPen("AWAY");
                 setStatus("idle");
               }}
-              className={`rounded-md px-3 py-1 text-sm ${
-                pen === "AWAY" ? "bg-emerald-600 text-white" : "bg-slate-800 text-slate-300"
+              className={`rounded-md px-3 py-1 text-sm font-semibold transition ${
+                pen === "AWAY" ? "bg-amber-400 text-slate-900" : "bg-white/15 text-white hover:bg-white/25"
               }`}
             >
               {awayTeam}
@@ -152,12 +152,12 @@ export default function PredictionForm({
           type="button"
           onClick={save}
           disabled={status === "saving"}
-          className="rounded-lg bg-emerald-600 px-4 py-1.5 text-sm font-semibold text-white hover:bg-emerald-500 disabled:opacity-50"
+          className="rounded-lg bg-amber-400 px-4 py-1.5 text-sm font-bold text-slate-900 shadow transition hover:bg-amber-300 disabled:opacity-50"
         >
           {status === "saving" ? "Guardando…" : status === "saved" ? "Actualizar" : "Guardar"}
         </button>
         {msg && (
-          <span className={`text-xs ${status === "error" ? "text-red-400" : "text-emerald-400"}`}>
+          <span className={`text-xs font-semibold ${status === "error" ? "text-red-200" : "text-emerald-200"}`}>
             {msg}
           </span>
         )}

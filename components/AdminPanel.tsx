@@ -35,15 +35,15 @@ function SyncButton() {
     setLoading(false);
   }
   return (
-    <div className="mb-6 rounded-xl border border-slate-800 bg-slate-900 p-4">
+    <div className="mb-6 rounded-xl border border-white/20 bg-white/10 p-4 shadow-lg backdrop-blur-md">
       <button
         onClick={run}
         disabled={loading}
-        className="rounded-lg bg-emerald-600 px-4 py-2 font-semibold text-white hover:bg-emerald-500 disabled:opacity-50"
+        className="rounded-lg bg-amber-400 px-4 py-2 font-bold text-slate-900 hover:bg-amber-300 disabled:opacity-50"
       >
         {loading ? "Sincronizando…" : "Sincronizar resultados ahora"}
       </button>
-      {msg && <p className="mt-2 text-sm text-slate-300">{msg}</p>}
+      {msg && <p className="mt-2 text-sm text-white/80">{msg}</p>}
     </div>
   );
 }
@@ -80,8 +80,8 @@ function ResultForm({ m }: { m: AdminMatch }) {
   }
 
   return (
-    <div className="rounded-xl border border-slate-800 bg-slate-900 p-4">
-      <div className="mb-1 text-xs text-slate-400">
+    <div className="rounded-xl border border-white/20 bg-white/10 p-4 shadow-lg backdrop-blur-md">
+      <div className="mb-1 text-xs text-white/70">
         {m.label} · {m.kickoff} · {m.status ?? "—"}
       </div>
       <div className="font-medium">
@@ -93,7 +93,7 @@ function ResultForm({ m }: { m: AdminMatch }) {
           min={0}
           value={home}
           onChange={(e) => setHome(e.target.value)}
-          className="w-14 rounded-md border border-slate-700 bg-slate-800 px-2 py-1 text-center"
+          className="w-14 rounded-md border border-white/30 bg-white/20 text-white px-2 py-1 text-center"
           placeholder="L"
         />
         <span>-</span>
@@ -102,7 +102,7 @@ function ResultForm({ m }: { m: AdminMatch }) {
           min={0}
           value={away}
           onChange={(e) => setAway(e.target.value)}
-          className="w-14 rounded-md border border-slate-700 bg-slate-800 px-2 py-1 text-center"
+          className="w-14 rounded-md border border-white/30 bg-white/20 text-white px-2 py-1 text-center"
           placeholder="V"
         />
         <label className="ml-2 flex items-center gap-1 text-sm">
@@ -113,7 +113,7 @@ function ResultForm({ m }: { m: AdminMatch }) {
           <select
             value={pen}
             onChange={(e) => setPen(e.target.value as "HOME" | "AWAY")}
-            className="rounded-md border border-slate-700 bg-slate-800 px-2 py-1 text-sm"
+            className="rounded-md border border-white/30 bg-white/20 text-white px-2 py-1 text-sm"
           >
             <option value="">Ganador penales…</option>
             <option value="HOME">{m.home_team}</option>
@@ -123,12 +123,12 @@ function ResultForm({ m }: { m: AdminMatch }) {
         <button
           onClick={save}
           disabled={loading}
-          className="rounded-lg bg-emerald-600 px-3 py-1 text-sm font-semibold text-white hover:bg-emerald-500 disabled:opacity-50"
+          className="rounded-lg bg-amber-400 px-3 py-1 text-sm font-bold text-slate-900 hover:bg-amber-300 disabled:opacity-50"
         >
           {loading ? "…" : "Guardar"}
         </button>
       </div>
-      {msg && <p className="mt-1 text-xs text-slate-300">{msg}</p>}
+      {msg && <p className="mt-1 text-xs text-white/80">{msg}</p>}
     </div>
   );
 }
@@ -138,12 +138,12 @@ export default function AdminPanel({ matches }: { matches: AdminMatch[] }) {
     <div>
       <SyncButton />
       <h2 className="mb-2 text-lg font-semibold">Corregir resultados manualmente</h2>
-      <p className="mb-3 text-sm text-slate-400">
+      <p className="mb-3 text-sm text-white/70">
         Úsalo solo si la API falla o se demora. Guardar vuelve a calcular los puntos del partido.
       </p>
       <div className="space-y-3">
         {matches.length === 0 && (
-          <p className="text-sm text-slate-500">No hay partidos con equipos definidos todavía.</p>
+          <p className="text-sm text-white/60">No hay partidos con equipos definidos todavía.</p>
         )}
         {matches.map((m) => (
           <ResultForm key={m.id} m={m} />

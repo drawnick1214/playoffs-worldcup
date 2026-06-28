@@ -40,10 +40,12 @@ export default async function AdminPage() {
   return (
     <main className="mx-auto max-w-3xl px-4 py-6">
       <header className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Panel de administración</h1>
+        <h1 className="text-2xl font-black uppercase tracking-tight drop-shadow">
+          Panel de administración
+        </h1>
         <Link
           href="/"
-          className="rounded-lg border border-slate-700 px-3 py-1.5 text-sm text-slate-300 hover:bg-slate-800"
+          className="rounded-lg border border-white/30 bg-white/10 px-3 py-1.5 text-sm font-semibold text-white hover:bg-white/20"
         >
           ← Volver
         </Link>

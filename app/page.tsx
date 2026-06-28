@@ -68,16 +68,18 @@ export default async function HomePage() {
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-6">
-      <header className="mb-6 flex items-center justify-between">
+      <header className="mb-6 flex items-center justify-between gap-2">
         <div>
-          <h1 className="text-2xl font-bold">⚽ Quiniela Mundial 2026</h1>
-          <p className="text-sm text-slate-400">Hola, {user.display_name}</p>
+          <h1 className="text-xl font-black uppercase leading-tight tracking-tight drop-shadow sm:text-2xl">
+            ⚽ Polla Playoffs <span className="text-amber-300">del Mundial</span>
+          </h1>
+          <p className="text-sm text-white/80">Hola, {user.display_name} 👋</p>
         </div>
         <div className="flex items-center gap-2">
           {user.is_admin && (
             <Link
               href="/admin"
-              className="rounded-lg border border-slate-700 px-3 py-1.5 text-sm text-slate-300 hover:bg-slate-800"
+              className="rounded-lg border border-white/30 bg-white/10 px-3 py-1.5 text-sm font-semibold text-white hover:bg-white/20"
             >
               Admin
             </Link>
@@ -87,10 +89,12 @@ export default async function HomePage() {
       </header>
 
       {/* Leaderboard */}
-      <section className="mb-8 rounded-2xl border border-slate-800 bg-slate-900 p-4">
-        <h2 className="mb-3 text-lg font-semibold">🏆 Tabla de posiciones</h2>
+      <section className="mb-8 rounded-2xl border border-white/20 bg-white/10 p-4 shadow-xl backdrop-blur-md">
+        <h2 className="mb-3 text-lg font-black uppercase tracking-wide text-amber-300">
+          🏆 Tabla de posiciones
+        </h2>
         {leaderboard.length === 0 ? (
-          <p className="px-1 text-sm text-slate-400">
+          <p className="px-1 text-sm text-white/70">
             Aún no hay jugadores. Comparte el enlace para que se registren.
           </p>
         ) : (
@@ -101,17 +105,17 @@ export default async function HomePage() {
                 <li
                   key={u.id}
                   className={`flex items-center justify-between rounded-lg px-3 py-2 ${
-                    u.id === user.id ? "bg-emerald-950/50" : ""
+                    u.id === user.id ? "bg-amber-400/25 ring-1 ring-amber-300/40" : ""
                   }`}
                 >
-                  <span className="flex items-center">
-                    <span className="mr-2 inline-block w-6 text-center text-slate-500">
+                  <span className="flex items-center font-semibold">
+                    <span className="mr-2 inline-block w-6 text-center text-white/70">
                       {medal ?? `${i + 1}.`}
                     </span>
                     {u.display_name}
-                    {u.id === user.id && <span className="ml-2 text-xs text-emerald-400">(tú)</span>}
+                    {u.id === user.id && <span className="ml-2 text-xs text-amber-200">(tú)</span>}
                   </span>
-                  <span className="font-semibold">{u.points} pts</span>
+                  <span className="font-black text-amber-300">{u.points} pts</span>
                 </li>
               );
             })}
@@ -120,8 +124,8 @@ export default async function HomePage() {
       </section>
 
       {/* Rules */}
-      <details className="mb-6 rounded-xl border border-slate-800 bg-slate-900/50 p-3 text-sm text-slate-400">
-        <summary className="cursor-pointer font-medium text-slate-300">¿Cómo se puntúa?</summary>
+      <details className="mb-6 rounded-xl border border-white/20 bg-white/10 p-3 text-sm text-white/80 backdrop-blur">
+        <summary className="cursor-pointer font-bold text-white">¿Cómo se puntúa?</summary>
         <ul className="mt-2 list-disc space-y-1 pl-5">
           <li>Marcador exacto: <strong>4 puntos</strong></li>
           <li>Resultado correcto (ganador o empate): <strong>1 punto</strong></li>
@@ -132,14 +136,16 @@ export default async function HomePage() {
 
       {/* Matches */}
       {groups.length === 0 && (
-        <p className="rounded-xl border border-slate-800 bg-slate-900 p-6 text-center text-slate-400">
+        <p className="rounded-xl border border-white/20 bg-white/10 p-6 text-center text-white/80 backdrop-blur">
           Todavía no hay partidos de playoffs disponibles. Vuelve pronto.
         </p>
       )}
 
       {groups.map((g) => (
         <section key={g.stage} className="mb-8">
-          <h2 className="mb-3 border-b border-slate-800 pb-1 text-lg font-semibold">{g.label}</h2>
+          <h2 className="mb-3 inline-block rounded-full bg-white/15 px-4 py-1 text-sm font-black uppercase tracking-wider text-white shadow">
+            {g.label}
+          </h2>
           <div className="space-y-3">
             {g.matches.map((m) => {
               const pred = predByMatch.get(m.id);
@@ -149,35 +155,42 @@ export default async function HomePage() {
               const predictable = teamsKnown && !locked && !finished;
 
               return (
-                <div key={m.id} className="rounded-xl border border-slate-800 bg-slate-900 p-4">
-                  <div className="flex items-center justify-between text-xs text-slate-400">
+                <div
+                  key={m.id}
+                  className="rounded-xl border border-white/20 bg-white/10 p-4 shadow-lg backdrop-blur-md transition hover:bg-white/15"
+                >
+                  <div className="flex items-center justify-between text-xs text-white/70">
                     <span>{formatBogota(m.kickoff_utc)}</span>
                     {finished ? (
-                      <span className="text-emerald-400">Finalizado</span>
+                      <span className="rounded-full bg-emerald-400/20 px-2 py-0.5 font-bold text-emerald-200">
+                        Finalizado
+                      </span>
                     ) : locked && teamsKnown ? (
-                      <span className="text-amber-400">Cerrado</span>
+                      <span className="rounded-full bg-amber-400/20 px-2 py-0.5 font-bold text-amber-200">
+                        Cerrado
+                      </span>
                     ) : null}
                   </div>
 
-                  <div className="mt-1 flex items-center justify-center gap-2 text-base font-semibold">
+                  <div className="mt-2 flex items-center justify-center gap-2 text-base font-bold">
                     <TeamName name={teamName(m.home_team)} crest={m.home_team_crest} />
-                    <span className="text-slate-500">vs</span>
+                    <span className="text-xs font-normal text-white/50">vs</span>
                     <TeamName name={teamName(m.away_team)} crest={m.away_team_crest} reverse />
                   </div>
 
                   {/* Finished: real result + my prediction + points */}
                   {finished && (
                     <div className="mt-2 text-center">
-                      <div className="text-2xl font-bold">
+                      <div className="text-3xl font-black text-amber-300 drop-shadow">
                         {m.reg_home} - {m.reg_away}
                       </div>
                       {m.went_to_pens && (
-                        <div className="text-xs text-amber-300">
+                        <div className="text-xs text-amber-200">
                           Penales: gana{" "}
                           {m.pen_winner === "HOME" ? teamName(m.home_team) : teamName(m.away_team)}
                         </div>
                       )}
-                      <div className="mt-2 text-sm text-slate-400">
+                      <div className="mt-2 text-sm text-white/75">
                         {pred ? (
                           <>
                             Tu predicción: {pred.pred_home} - {pred.pred_away}
@@ -192,12 +205,12 @@ export default async function HomePage() {
                               </>
                             )}{" "}
                             ·{" "}
-                            <span className="font-semibold text-emerald-400">
+                            <span className="rounded-full bg-emerald-400/20 px-2 py-0.5 font-bold text-emerald-100">
                               {pred.points ?? 0} pts
                             </span>
                           </>
                         ) : (
-                          <span className="text-slate-500">No predijiste este partido.</span>
+                          <span className="text-white/50">No predijiste este partido.</span>
                         )}
                       </div>
                     </div>
@@ -221,7 +234,7 @@ export default async function HomePage() {
 
                   {/* Locked (not finished) */}
                   {!finished && locked && teamsKnown && (
-                    <div className="mt-2 text-center text-sm text-slate-400">
+                    <div className="mt-2 text-center text-sm text-white/75">
                       {pred ? (
                         <>
                           Tu predicción: {pred.pred_home} - {pred.pred_away}
@@ -237,14 +250,14 @@ export default async function HomePage() {
                           )}
                         </>
                       ) : (
-                        <span className="text-slate-500">No alcanzaste a predecir.</span>
+                        <span className="text-white/50">No alcanzaste a predecir.</span>
                       )}
                     </div>
                   )}
 
                   {/* Teams not known yet */}
                   {!finished && !teamsKnown && (
-                    <div className="mt-2 text-center text-sm text-slate-500">
+                    <div className="mt-2 text-center text-sm text-white/60">
                       Equipos por definir. Podrás predecir cuando se conozcan.
                     </div>
                   )}
