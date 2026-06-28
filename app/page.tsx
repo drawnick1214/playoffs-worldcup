@@ -161,18 +161,28 @@ export default async function HomePage() {
           <li><strong>0 pts</strong> — No aciertas el resultado.</li>
         </ul>
 
-        <p className="mt-3 font-semibold text-white">🤝 Empates y quién pasa</p>
+        <p className="mt-3 font-semibold text-white">🤝 Si crees que el partido será empate</p>
         <ul className="mt-1 list-disc space-y-1 pl-5">
           <li>
-            Un <strong>empate</strong> se refiere al marcador de los <strong>90 minutos</strong>. Los
-            goles de la prórroga no cuentan.
+            En eliminatorias siempre hay un clasificado, pero aquí el <strong>empate se mide a los
+            90 minutos</strong>: si al minuto 90 van iguales, es empate (no importa lo que pase en la
+            prórroga o los penales).
           </li>
-          <li>Si predices empate, además eliges <strong>qué equipo crees que pasa</strong> (por prórroga o penales).</li>
           <li>
-            Si el partido queda empatado a los 90&apos; y aciertas quién pasa:
-            <strong> +1 punto extra</strong>.
+            Cuando predices un empate (ej. <strong>1-1</strong>), también debes elegir{" "}
+            <strong>qué equipo crees que clasifica</strong>.
           </li>
         </ul>
+        <p className="mt-2 font-medium text-white/90">Puntos cuando predices empate:</p>
+        <ul className="mt-1 list-disc space-y-1 pl-5">
+          <li><strong>4 pts</strong> si aciertas el marcador exacto del empate (pones 1-1 y a los 90&apos; van 1-1).</li>
+          <li><strong>1 pt</strong> si solo aciertas que fue empate, con otro marcador (pones 1-1 y van 0-0).</li>
+          <li><strong>+1 pt</strong> adicional si aciertas el equipo que clasifica.</li>
+        </ul>
+        <p className="mt-2 rounded-lg bg-amber-400/15 px-3 py-2 text-white/90">
+          <strong>Ejemplo:</strong> predices <strong>1-1 y que pasa Brasil</strong>. El partido va 1-1
+          a los 90&apos; y Brasil clasifica → <strong>4 + 1 = 5 puntos</strong> (el máximo). 🎯
+        </p>
 
         <p className="mt-3 text-xs text-white/60">
           Gana la polla quien acumule más puntos. Mira tu posición en la pestaña 🏆 Leaderboard.
