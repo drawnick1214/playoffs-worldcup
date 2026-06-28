@@ -55,20 +55,12 @@ create index if not exists predictions_match_idx on predictions(match_id);
 create index if not exists predictions_user_idx  on predictions(user_id);
 
 -- ---------------------------------------------------------------------------
--- Seed the 5 players. EDIT the usernames, display names and passwords below.
--- The password is the 2nd argument to crypt(). Re-running is safe (on conflict).
--- ---------------------------------------------------------------------------
-
--- One of the 5 players is also the admin (is_admin = true) so they can fix a
--- result manually if the API ever fails. They still play and appear on the board.
-insert into users (username, display_name, password_hash, is_admin) values
-  ('jugador1', 'Jugador 1', crypt('cambiar-1', gen_salt('bf', 10)), true),
-  ('jugador2', 'Jugador 2', crypt('cambiar-2', gen_salt('bf', 10)), false),
-  ('jugador3', 'Jugador 3', crypt('cambiar-3', gen_salt('bf', 10)), false),
-  ('jugador4', 'Jugador 4', crypt('cambiar-4', gen_salt('bf', 10)), false),
-  ('jugador5', 'Jugador 5', crypt('cambiar-5', gen_salt('bf', 10)), false)
-on conflict (username) do nothing;
-
--- To change a password later:
+-- No seed users: players self-register from the app's "Crear cuenta" screen.
+-- The FIRST person to register automatically becomes the admin.
+--
+-- To grant admin to someone else later:
+--   update users set is_admin = true where username = 'su_usuario';
+-- To reset a password manually:
 --   update users set password_hash = crypt('nueva-clave', gen_salt('bf', 10))
---   where username = 'jugador1';
+--   where username = 'su_usuario';
+-- ---------------------------------------------------------------------------
