@@ -142,57 +142,49 @@ export default async function HomePage() {
         <p className="mt-3 font-semibold text-white">⚽ Cómo se juega</p>
         <ul className="mt-1 list-disc space-y-1 pl-5">
           <li>Predice el <strong>marcador</strong> de cada partido de las eliminatorias.</li>
-          <li>
-            Puedes <strong>editar</strong> tu predicción hasta <strong>15 minutos antes</strong> del
-            inicio del partido. Después queda bloqueada.
-          </li>
-          <li>
-            Tus predicciones son <strong>privadas</strong>: nadie las ve hasta que el partido se
-            cierra. Ahí se revelan las de todos.
-          </li>
+          <li>Puedes editar tu predicción hasta <strong>15 minutos antes</strong> del partido. Después se bloquea.</li>
+          <li>Tus predicciones son <strong>privadas</strong> hasta que el partido se cierra; ahí se revelan las de todos.</li>
         </ul>
 
-        <p className="mt-3 font-semibold text-white">
-          🏅 Puntos <span className="font-normal text-white/60">(solo cuentan los 90 minutos; la prórroga NO)</span>
+        <p className="mt-4 font-semibold text-white">🏅 Cómo se ganan los puntos</p>
+        <p className="mt-1 text-white/70">
+          Importante: <strong>solo cuenta el marcador de los 90 minutos</strong>. Los goles de la
+          prórroga y los penales <strong>no</strong> cambian el marcador.
         </p>
+        <p className="mt-2 text-white/90">Tu predicción suma por <strong>dos cosas distintas</strong> (se suman entre sí):</p>
+
+        <p className="mt-2 font-medium text-amber-200">1) Por el marcador (90&apos;)</p>
         <ul className="mt-1 list-disc space-y-1 pl-5">
-          <li><strong>3 pts</strong> — Marcador exacto. <span className="text-white/60">Ej: pones 2-1 y queda 2-1.</span></li>
-          <li><strong>1 pt</strong> — Aciertas solo el resultado (quién gana o empate), con marcador distinto. <span className="text-white/60">Ej: pones 3-0 y queda 2-1.</span></li>
-          <li className="text-white/60">El marcador exacto y el resultado no se suman: o son 3, o es 1.</li>
-          <li>
-            <strong>+1 pt</strong> — Aciertas <strong>qué equipo clasifica</strong>, en <strong>cada</strong>{" "}
-            partido (se suma a lo anterior). El que pones ganador es tu candidato a clasificar; si
-            predices empate, eliges tú quién pasa.
-          </li>
-          <li className="text-white/60">Máximo por partido: <strong>4</strong> (marcador exacto + acertar quién clasifica).</li>
+          <li><strong>3 pts</strong> si aciertas el <strong>marcador exacto</strong>.</li>
+          <li><strong>1 pt</strong> si solo aciertas el <strong>resultado</strong> (quién gana, o que es empate) con otro marcador.</li>
+          <li><strong>0 pts</strong> si fallas el resultado.</li>
+          <li className="text-white/60">Estos no se acumulan entre sí: es 3, o 1, o 0.</li>
         </ul>
-        <p className="mt-2 rounded-lg bg-amber-400/15 px-3 py-2 text-white/90">
-          <strong>Ejemplo:</strong> pones <strong>Brasil 2-1</strong> y queda 2-1 con Brasil
-          clasificando → 3 (exacto) + 1 (clasifica) = <strong>4 pts</strong>. Si pones 3-0 (Brasil) y
-          queda 2-1 → 1 (resultado) + 1 (clasifica) = <strong>2 pts</strong>.
+
+        <p className="mt-2 font-medium text-amber-200">2) Por quién clasifica (+1 en CADA partido)</p>
+        <ul className="mt-1 list-disc space-y-1 pl-5">
+          <li>El equipo que pones <strong>ganador</strong> es a quien apuestas que clasifica.</li>
+          <li>Si predices <strong>empate</strong>, eliges tú qué equipo clasifica (gane en prórroga o penales).</li>
+          <li>Si aciertas quién clasifica: <strong>+1 pt</strong>.</li>
+        </ul>
+
+        <p className="mt-2 text-white/90">
+          🔝 <strong>Máximo por partido: 4 puntos</strong> (3 marcador exacto + 1 quién clasifica).
         </p>
 
-        <p className="mt-3 font-semibold text-white">🤝 Si crees que el partido será empate</p>
-        <ul className="mt-1 list-disc space-y-1 pl-5">
-          <li>
-            En eliminatorias siempre hay un clasificado, pero aquí el <strong>empate se mide a los
-            90 minutos</strong>: si al minuto 90 van iguales, es empate (no importa lo que pase en la
-            prórroga o los penales).
-          </li>
-          <li>
-            Cuando predices un empate (ej. <strong>1-1</strong>), también debes elegir{" "}
-            <strong>qué equipo crees que clasifica</strong>.
-          </li>
-        </ul>
-        <p className="mt-2 font-medium text-white/90">Puntos cuando predices empate:</p>
-        <ul className="mt-1 list-disc space-y-1 pl-5">
-          <li><strong>3 pts</strong> si aciertas el marcador exacto del empate (pones 1-1 y a los 90&apos; van 1-1).</li>
-          <li><strong>1 pt</strong> si solo aciertas que fue empate, con otro marcador (pones 1-1 y van 0-0).</li>
-          <li><strong>+1 pt</strong> adicional si aciertas el equipo que clasifica.</li>
-        </ul>
-        <p className="mt-2 rounded-lg bg-amber-400/15 px-3 py-2 text-white/90">
-          <strong>Ejemplo:</strong> predices <strong>1-1 y que pasa Brasil</strong>. El partido va 1-1
-          a los 90&apos; y Brasil clasifica → <strong>3 + 1 = 4 puntos</strong> (el máximo). 🎯
+        <div className="mt-3 space-y-1 rounded-lg bg-amber-400/15 px-3 py-2 text-white/90">
+          <p className="font-semibold">Ejemplos:</p>
+          <p>• Pones <strong>Brasil 2-1</strong>, queda 2-1 y clasifica Brasil → 3 + 1 = <strong>4</strong>.</p>
+          <p>• Pones <strong>Brasil 3-0</strong>, queda 2-1 y clasifica Brasil → 1 (resultado) + 1 (clasifica) = <strong>2</strong>.</p>
+          <p>• Pones <strong>empate 1-1, pasa P. Bajos</strong>; van 1-1 pero clasifica Marruecos → 3 (marcador) + 0 = <strong>3</strong>.</p>
+          <p>• Pones <strong>2-0</strong> local y gana el visitante → <strong>0</strong>.</p>
+        </div>
+
+        <p className="mt-3 font-semibold text-white">🤝 ¿Qué cuenta como empate?</p>
+        <p className="mt-1 text-white/80">
+          En eliminatorias siempre hay un clasificado, pero el <strong>empate se mide a los 90
+          minutos</strong>: si al minuto 90 van iguales, es empate (sin importar la prórroga o los
+          penales). Por eso, al predecir empate, además eliges quién crees que clasifica.
         </p>
 
         <p className="mt-3 text-xs text-white/60">
