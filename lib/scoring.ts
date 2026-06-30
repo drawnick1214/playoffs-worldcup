@@ -22,27 +22,30 @@ export interface ScoredPrediction {
 }
 
 /**
- * Points for a single prediction against a finished match.
- *  - Correct result at 90' (HOME/AWAY/DRAW): +1
- *  - Exact 90' score: +3 (stacks with the result point => 4 total)
+ * Points for a single prediction against a finished match (do NOT stack the
+ * exact-score with the result point):
+ *  - Exact 90' score: 3 pts
+ *  - Otherwise, correct result at 90' (HOME/AWAY/DRAW): 1 pt
  *  - Predicted a draw, the match was level after 90', and the predicted team
- *    to advance ("ganador de la llave") is correct: +1 bonus
- * Max = 5 (exact tie + correct advancing team).
+ *    to advance is correct: +1 pt (added on top)
+ * Max = 4 (exact draw + correct advancing team).
  */
 export function scorePrediction(m: ScoredMatch, p: ScoredPrediction): number {
   let points = 0;
 
   const predResult = classify(p.pred_home, p.pred_away);
-  if (predResult === m.result) points += 1;
 
   // Exact score only when the 90' scoreline is known.
-  if (
+  const exact =
     m.reg_home != null &&
     m.reg_away != null &&
     p.pred_home === m.reg_home &&
-    p.pred_away === m.reg_away
-  ) {
+    p.pred_away === m.reg_away;
+
+  if (exact) {
     points += 3;
+  } else if (predResult === m.result) {
+    points += 1;
   }
 
   if (

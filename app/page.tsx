@@ -156,9 +156,10 @@ export default async function HomePage() {
           🏅 Puntos <span className="font-normal text-white/60">(solo cuentan los 90 minutos; la prórroga NO)</span>
         </p>
         <ul className="mt-1 list-disc space-y-1 pl-5">
-          <li><strong>4 pts</strong> — Marcador exacto. <span className="text-white/60">Ej: pones 2-1 y queda 2-1.</span></li>
+          <li><strong>3 pts</strong> — Marcador exacto. <span className="text-white/60">Ej: pones 2-1 y queda 2-1.</span></li>
           <li><strong>1 pt</strong> — Aciertas solo el resultado (quién gana o empate), con marcador distinto. <span className="text-white/60">Ej: pones 3-0 y queda 2-1 → acertaste que ganaba el local.</span></li>
           <li><strong>0 pts</strong> — No aciertas el resultado.</li>
+          <li className="text-white/60">El marcador exacto y el resultado no se suman: o son 3, o es 1.</li>
         </ul>
 
         <p className="mt-3 font-semibold text-white">🤝 Si crees que el partido será empate</p>
@@ -175,13 +176,13 @@ export default async function HomePage() {
         </ul>
         <p className="mt-2 font-medium text-white/90">Puntos cuando predices empate:</p>
         <ul className="mt-1 list-disc space-y-1 pl-5">
-          <li><strong>4 pts</strong> si aciertas el marcador exacto del empate (pones 1-1 y a los 90&apos; van 1-1).</li>
+          <li><strong>3 pts</strong> si aciertas el marcador exacto del empate (pones 1-1 y a los 90&apos; van 1-1).</li>
           <li><strong>1 pt</strong> si solo aciertas que fue empate, con otro marcador (pones 1-1 y van 0-0).</li>
           <li><strong>+1 pt</strong> adicional si aciertas el equipo que clasifica.</li>
         </ul>
         <p className="mt-2 rounded-lg bg-amber-400/15 px-3 py-2 text-white/90">
           <strong>Ejemplo:</strong> predices <strong>1-1 y que pasa Brasil</strong>. El partido va 1-1
-          a los 90&apos; y Brasil clasifica → <strong>4 + 1 = 5 puntos</strong> (el máximo). 🎯
+          a los 90&apos; y Brasil clasifica → <strong>3 + 1 = 4 puntos</strong> (el máximo). 🎯
         </p>
 
         <p className="mt-3 text-xs text-white/60">
