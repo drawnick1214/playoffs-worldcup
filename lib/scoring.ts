@@ -12,7 +12,7 @@ export interface ScoredMatch {
   reg_away: number | null;
   result: MatchResult; // result at 90' — DRAW when level after 90'
   drew_at_90: boolean; // true when level after 90' (decided in extra time or penalties)
-  advance_winner: Side | null; // who advanced (only when drew_at_90)
+  advance_winner: Side | null; // the team that advanced (every match: winner of the tie)
 }
 
 export interface ScoredPrediction {
@@ -22,13 +22,14 @@ export interface ScoredPrediction {
 }
 
 /**
- * Points for a single prediction against a finished match (do NOT stack the
- * exact-score with the result point):
+ * Points for a single prediction against a finished match:
  *  - Exact 90' score: 3 pts
  *  - Otherwise, correct result at 90' (HOME/AWAY/DRAW): 1 pt
- *  - Predicted a draw, the match was level after 90', and the predicted team
- *    to advance is correct: +1 pt (added on top)
- * Max = 4 (exact draw + correct advancing team).
+ *    (exact and result do NOT stack — it's 3, or 1, or 0)
+ *  - Correct team to advance: +1 pt, on EVERY match (added on top).
+ *    The predicted team to advance is the predicted winner; for a predicted
+ *    draw it's the explicit "who advances" pick.
+ * Max = 4 (exact + correct advancing team).
  */
 export function scorePrediction(m: ScoredMatch, p: ScoredPrediction): number {
   let points = 0;
@@ -48,12 +49,10 @@ export function scorePrediction(m: ScoredMatch, p: ScoredPrediction): number {
     points += 1;
   }
 
-  if (
-    m.drew_at_90 &&
-    predResult === "DRAW" &&
-    p.pred_advance_winner != null &&
-    p.pred_advance_winner === m.advance_winner
-  ) {
+  // Who advances — counts on every match.
+  const predAdvancer: Side | null =
+    p.pred_home > p.pred_away ? "HOME" : p.pred_home < p.pred_away ? "AWAY" : p.pred_advance_winner;
+  if (predAdvancer != null && m.advance_winner != null && predAdvancer === m.advance_winner) {
     points += 1;
   }
 

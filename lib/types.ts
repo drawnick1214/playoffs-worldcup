@@ -27,8 +27,9 @@ export interface Match {
   reg_away: number | null;
   result: MatchResult | null;
   drew_at_90: boolean; // true if level after 90' (decided in extra time or penalties)
-  advance_winner: Side | null; // who advanced when it was a draw at 90'
+  advance_winner: Side | null; // the team that advanced (winner of the tie)
   scored: boolean;
+  result_locked: boolean; // admin manually set the result; sync won't overwrite it
   updated_at: string;
 }
 

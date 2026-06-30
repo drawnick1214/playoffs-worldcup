@@ -22,18 +22,19 @@ export async function runSync(): Promise<SyncResult> {
     fetchWorldCupMatches(),
     fetchOpenfootballMap().catch(() => ({}) as Record<string, OpenfootballInfo>),
   ]);
-  // Matches already FINISHED in our DB are frozen: we never overwrite their
-  // result fields again (protects manual admin corrections and locked results).
-  const { data: finishedRows } = await supabase
+  // Only matches the admin manually locked are protected from being overwritten.
+  // Everything else stays in sync with the API, so late corrections (e.g. the
+  // penalty-shootout winner recorded after the final whistle) are picked up.
+  const { data: lockedRows } = await supabase
     .from("matches")
     .select("external_id")
-    .eq("status", "FINISHED");
-  const frozen = new Set((finishedRows ?? []).map((m) => m.external_id as string));
+    .eq("result_locked", true);
+  const locked = new Set((lockedRows ?? []).map((m) => m.external_id as string));
 
   const rows = fdMatches
     .map(mapMatch)
     .filter((r): r is NonNullable<typeof r> => r !== null)
-    .filter((r) => !frozen.has(r.external_id))
+    .filter((r) => !locked.has(r.external_id))
     .map((r) => {
       const key = r.kickoff_utc ? new Date(r.kickoff_utc).toISOString() : null;
       return { ...r, venue: (key && ofMap[key]?.venue) || r.venue };
@@ -87,7 +88,10 @@ async function backfill90Scores(ofMap: Record<string, OpenfootballInfo>): Promis
   }
 }
 
-/** Score every finished-but-unscored match. Shared by sync and manual admin override. */
+/**
+ * (Re)score every finished match. Idempotent — runs each sync so that any late
+ * correction from the API (or admin) is reflected in the points immediately.
+ */
 export async function scoreFinishedMatches(): Promise<{
   scoredMatches: number;
   scoredPredictions: number;
@@ -97,8 +101,7 @@ export async function scoreFinishedMatches(): Promise<{
   const { data: pending } = await supabase
     .from("matches")
     .select("*")
-    .eq("status", "FINISHED")
-    .eq("scored", false);
+    .eq("status", "FINISHED");
 
   const matches = (pending ?? []) as Match[];
   let scoredMatches = 0;

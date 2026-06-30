@@ -125,13 +125,18 @@ function deriveScore(m: FdMatch): Pick<
   // can still be graded without any manual entry.
   const drewAt90 = s.duration === "EXTRA_TIME" || s.duration === "PENALTY_SHOOTOUT";
 
+  // The team that advances = the official winner of the tie (covers 90', extra
+  // time and penalties). Null if the API hasn't recorded it yet.
+  const advancer: Side | null =
+    s.winner === "HOME_TEAM" ? "HOME" : s.winner === "AWAY_TEAM" ? "AWAY" : null;
+
   if (drewAt90) {
     return {
       reg_home: null,
       reg_away: null,
       result: "DRAW",
       drew_at_90: true,
-      advance_winner: s.winner === "AWAY_TEAM" ? "AWAY" : "HOME",
+      advance_winner: advancer,
     };
   }
 
@@ -140,7 +145,7 @@ function deriveScore(m: FdMatch): Pick<
   else if (s.winner === "AWAY_TEAM") result = "AWAY";
   else if (home != null && away != null) result = classifyGoals(home, away);
 
-  return { reg_home: home, reg_away: away, result, drew_at_90: false, advance_winner: null };
+  return { reg_home: home, reg_away: away, result, drew_at_90: false, advance_winner: advancer };
 }
 
 function classifyGoals(home: number, away: number): MatchResult {

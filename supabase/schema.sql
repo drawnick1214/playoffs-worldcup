@@ -37,8 +37,9 @@ create table if not exists matches (
   reg_away       int,                             -- regulation (90') goals, away
   result         text,                            -- HOME / AWAY / DRAW (at 90')
   drew_at_90     boolean not null default false,  -- empate al 90' (definido en prórroga o penales)
-  advance_winner text,                            -- HOME / AWAY (equipo que pasó la llave)
+  advance_winner text,                            -- HOME / AWAY (equipo que avanzó la llave)
   scored         boolean not null default false,  -- points already distributed
+  result_locked  boolean not null default false,  -- admin fijó el resultado a mano (sync no lo toca)
   updated_at     timestamptz not null default now()
 );
 

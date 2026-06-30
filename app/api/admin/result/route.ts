@@ -53,6 +53,14 @@ export async function POST(req: Request) {
   }
 
   const result: MatchResult = drewAt90 ? "DRAW" : classify(regHome, regAway);
+  // For a decisive match the team that advances is the winner.
+  const advancer = drewAt90
+    ? advanceWinner
+    : result === "HOME"
+      ? "HOME"
+      : result === "AWAY"
+        ? "AWAY"
+        : null;
 
   const { error } = await db()
     .from("matches")
@@ -62,7 +70,8 @@ export async function POST(req: Request) {
       reg_away: regAway,
       result,
       drew_at_90: drewAt90,
-      advance_winner: advanceWinner,
+      advance_winner: advancer,
+      result_locked: true, // admin override: protect from API sync
       scored: false, // force re-scoring
       updated_at: new Date().toISOString(),
     })

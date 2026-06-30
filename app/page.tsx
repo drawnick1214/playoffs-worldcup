@@ -157,10 +157,20 @@ export default async function HomePage() {
         </p>
         <ul className="mt-1 list-disc space-y-1 pl-5">
           <li><strong>3 pts</strong> — Marcador exacto. <span className="text-white/60">Ej: pones 2-1 y queda 2-1.</span></li>
-          <li><strong>1 pt</strong> — Aciertas solo el resultado (quién gana o empate), con marcador distinto. <span className="text-white/60">Ej: pones 3-0 y queda 2-1 → acertaste que ganaba el local.</span></li>
-          <li><strong>0 pts</strong> — No aciertas el resultado.</li>
+          <li><strong>1 pt</strong> — Aciertas solo el resultado (quién gana o empate), con marcador distinto. <span className="text-white/60">Ej: pones 3-0 y queda 2-1.</span></li>
           <li className="text-white/60">El marcador exacto y el resultado no se suman: o son 3, o es 1.</li>
+          <li>
+            <strong>+1 pt</strong> — Aciertas <strong>qué equipo clasifica</strong>, en <strong>cada</strong>{" "}
+            partido (se suma a lo anterior). El que pones ganador es tu candidato a clasificar; si
+            predices empate, eliges tú quién pasa.
+          </li>
+          <li className="text-white/60">Máximo por partido: <strong>4</strong> (marcador exacto + acertar quién clasifica).</li>
         </ul>
+        <p className="mt-2 rounded-lg bg-amber-400/15 px-3 py-2 text-white/90">
+          <strong>Ejemplo:</strong> pones <strong>Brasil 2-1</strong> y queda 2-1 con Brasil
+          clasificando → 3 (exacto) + 1 (clasifica) = <strong>4 pts</strong>. Si pones 3-0 (Brasil) y
+          queda 2-1 → 1 (resultado) + 1 (clasifica) = <strong>2 pts</strong>.
+        </p>
 
         <p className="mt-3 font-semibold text-white">🤝 Si crees que el partido será empate</p>
         <ul className="mt-1 list-disc space-y-1 pl-5">
